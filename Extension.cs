@@ -65,8 +65,10 @@ namespace WpfApp3
             string defValue = defaulValue;
             textBox.KeyDown += (se, ea) =>
             {
-                char ch = ((char)KeyInterop.VirtualKeyFromKey(ea.Key));
-                if (!char.IsDigit(ch)) ea.Handled = true;
+                List<Key> allowedKeys = new List<Key>() { Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, 
+                    Key.D6, Key.D7, Key.D8, Key.D9, Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3,Key.NumPad4, 
+                    Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9};
+                if (!allowedKeys.Contains(ea.Key)) ea.Handled = true;
             };
 
             textBox.TextChanged += (se, sa) => { };
