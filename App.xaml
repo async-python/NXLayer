@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:WpfApp3"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <BitmapImage x:Key="cut" UriSource="Recources\cut_icon.png">
+        </BitmapImage>
     </Application.Resources>
 </Application>

@@ -20,6 +20,7 @@ namespace WpfApp3
         private ProgressBarIncreaseCallback increaseCallback; //Увеличение значения прогресбара на 1
         private ProgressBarResetCallback resetCallback; //Обнуление прогрессбара
         private ExceptionCallback exCallback; //Вывод сообщения ошибки в основной поток
+        private ButtonControlsAccess btCallback; //Активация и деактивация кнопок управления
 
         private const string NxMainGategory = "ALL";
         private const int unusedLayer = 1;
@@ -28,7 +29,8 @@ namespace WpfApp3
         public ThreadCategoryCreate(
             ProgressBarIncreaseCallback cback,
             ProgressBarResetCallback rback,
-            ExceptionCallback eback)
+            ExceptionCallback eback,
+            ButtonControlsAccess bback)
         {
             theSession = NXOpen.Session.GetSession();
             workPart = theSession.Parts.Work;
@@ -36,6 +38,7 @@ namespace WpfApp3
             increaseCallback = cback;
             resetCallback = rback;
             exCallback = eback;
+            btCallback = bback;
         }
 
         public void createListCategories(List<Category> Group)
@@ -50,6 +53,7 @@ namespace WpfApp3
             {
                 try
                 {
+                    btCallback(false);
                     if (Group.Count == 0) throw new Exception("Количество категорий меньше 1");
                     var currentCategoryList = workPart.LayerCategories.ToArray().ToList();
                     int requestLayersCount = 0;
@@ -88,8 +92,10 @@ namespace WpfApp3
                             ++w;
                         }
                         workPart.LayerCategories.CreateCategory(x.Name, "", arr);
+                        Thread.Sleep(50);
                     });
                     resetCallback(true);
+                    btCallback(true);
                 }
                 catch (Exception ex) { exCallback(ex); }
             });
@@ -101,4 +107,5 @@ namespace WpfApp3
     public delegate void ProgressBarIncreaseCallback(Boolean val);
     public delegate void ProgressBarResetCallback(Boolean val);
     public delegate void ExceptionCallback(Exception ex);
+    public delegate void ButtonControlsAccess(Boolean val);
 }

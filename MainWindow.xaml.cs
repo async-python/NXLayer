@@ -39,6 +39,7 @@ namespace WpfApp3
             try
             {
                 InitializeComponent();
+                Singleton.GetInstance();
                 theSession = NXOpen.Session.GetSession();
                 workPart = theSession.Parts.Work;
                 BasePart = theSession.Parts.BaseWork;
@@ -46,7 +47,8 @@ namespace WpfApp3
                 threadCategoryCreator = new ThreadCategoryCreate(
                     new ProgressBarIncreaseCallback(progressBarIncrease),
                     new ProgressBarResetCallback(progressBarReset),
-                    new ExceptionCallback(ExceptionThread)
+                    new ExceptionCallback(ExceptionThread),
+                    new ButtonControlsAccess(buttonAccess)
                     );
                 updateLayerCategories();
             }
@@ -190,13 +192,21 @@ namespace WpfApp3
         //=====================================================================
         private void CreateSingleCategory_Click(object sender, RoutedEventArgs e)
         {
-            string requestCategoryName = InputCategoryName.Text;
-            int requestLayersCount = Convert.ToInt32(InputLayerCount.Text);
-            ProgressBarCategory.Maximum = requestLayersCount;
+            try
+            {
+                if (InputLayerCount.Text.Length == 0 || Convert.ToInt32(InputLayerCount.Text) == 0) {
+                    throw new Exception("число категорий должно быть больше 0");
+                };
+                string requestCategoryName = InputCategoryName.Text;
+                int requestLayersCount = Convert.ToInt32(InputLayerCount.Text);
+                ProgressBarCategory.Maximum = requestLayersCount;
 
-            List<Category> CategoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
-            threadCategoryCreator.createListCategories(CategoryGroup);
-            //threadCategoryCreator.CreateCategory(requestCategoryName, requestLayersCount);
+                List<Category> CategoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
+                threadCategoryCreator.createListCategories(CategoryGroup);
+            }
+            catch (Exception ex) {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         //=====================================================================
@@ -206,6 +216,8 @@ namespace WpfApp3
         {
             try
             {
+                InputCategoryName.Text = Singleton.InputTextCategory;
+                InputGroupName.Text = Singleton.InputTextGroup;
                 InputCategoryName.Foreground = Brushes.LightGray;
                 InputGroupName.Foreground = Brushes.LightGray;
                 InputCategoryName.setStringTextBoxBehavior(InputCategoryName.Text, CreateCategory);
@@ -237,15 +249,31 @@ namespace WpfApp3
                 ProgressBarCategory.Value = 0;
             });
         }
-        private void ExceptionThread(Exception ex) 
+        private void ExceptionThread(Exception ex)
         {
             Dispatcher.Invoke(() => { MessageBox.Show(ex.Message); ProgressBarCategory.Value = 0; });
+        }
+
+        private void buttonAccess(Boolean val)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (val)
+                {
+                    if (InputCategoryName.Text != Singleton.InputTextCategory) CreateCategory.IsEnabled = true;
+                    if (InputGroupName.Text != Singleton.InputTextGroup) CreateGroupCategories.IsEnabled = true;
+                }
+                else {
+                    CreateCategory.IsEnabled = false;
+                    CreateGroupCategories.IsEnabled = false;
+                }
+            });
         }
 
         //=====================================================================
         //Создать группу категорий в отдельном потоке
         //=====================================================================
-        private void CreateGroupCategories_Click(object sender, RoutedEventArgs e)
+        private void CreateGroupCategories_Click(object sender, RoutedEventArgs e) 
         {
             string requestGroupName = InputGroupName.Text;
             int requestGroupCount = Convert.ToInt32(InputGroupCount.Text);
@@ -255,6 +283,21 @@ namespace WpfApp3
             CategoryConfigurator config = new CategoryConfigurator();
             List<Category> CategoryGroup = config.getCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
             threadCategoryCreator.createListCategories(CategoryGroup);
+        }
+
+        public void showMessageBox(object sender, RoutedEventArgs e) {
+            var sitems = ListViewCategories.SelectedItems;
+            int x = sitems.Count;
+            for (int i = 0; i < x; ++i)
+            {
+                var item = ListViewCategories.SelectedItem;
+                var r = item as Category;
+                //MessageBox.Show(r.Name);
+                var t = workPart.LayerCategories.FindObject(r.Name);
+                theSession.UpdateManager.AddToDeleteList(t);
+                ListViewCategories.Items.Remove(item);
+            }
+            updateNxScreen();
         }
     }
 }
