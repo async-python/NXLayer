@@ -75,7 +75,11 @@ namespace WpfApp3
 
             textBox.MouseLeave += (se, sa) => 
             {
-                if (textBox.Text.Length == 0 || textBox.Text == "0") textBox.Text = defValue;
+                if (textBox.Text.Length == 0 || textBox.Text == "0") 
+                { 
+                    textBox.Text = defValue;
+                    textBox.Select(textBox.Text.Length, 0);
+                }
             };
         }
     }

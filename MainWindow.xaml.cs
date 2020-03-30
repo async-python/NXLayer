@@ -22,6 +22,7 @@ namespace WpfApp3
 {
     public partial class MainWindow : Window
     {
+        private ThreadCategoryCreate threadCategoryCreator;
         private NXOpen.Session theSession;
         private NXOpen.Part workPart;
         private NXOpen.BasePart BasePart;
@@ -42,6 +43,11 @@ namespace WpfApp3
                 workPart = theSession.Parts.Work;
                 BasePart = theSession.Parts.BaseWork;
                 displayPart = theSession.Parts.Display;
+                threadCategoryCreator = new ThreadCategoryCreate(
+                    new ProgressBarIncreaseCallback(progressBarIncrease),
+                    new ProgressBarResetCallback(progressBarReset),
+                    new ExceptionCallback(ExceptionThread)
+                    );
                 updateLayerCategories();
             }
             catch (Exception ex)
@@ -179,56 +185,23 @@ namespace WpfApp3
             this.Close();
         }
 
-        private void createNewCategory() { 
-
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        //=====================================================================
+        //Создать отдельную категорию в новом потоке
+        //=====================================================================
+        private void CreateSingleCategory_Click(object sender, RoutedEventArgs e)
         {
             string requestCategoryName = InputCategoryName.Text;
             int requestLayersCount = Convert.ToInt32(InputLayerCount.Text);
-            ThreadCategoryCreate tcc = new ThreadCategoryCreate(requestCategoryName, requestLayersCount, new ExampleCallback(ResultCallback));
-            Thread testth = new Thread(new ThreadStart(tcc.beginProc));
-            testth.Start();
             ProgressBarCategory.Maximum = requestLayersCount;
-            ThreadStart ts = new ThreadStart(() =>
-            {
-                try
-                {
-                    var CatArray = workPart.LayerCategories.ToArray().Where(x => x.Name != NxMainGategory).ToList();
-                    CatArray.ForEach(x => { if (x.Name == requestCategoryName) throw new Exception("Имя категории уже существует"); });
-                    var layers = new List<int>();
-                    CatArray.ForEach(x => { layers.AddRange(x.GetMemberLayers().ToList()); });
-                    var allLayers = workPart.LayerCategories.FindObject(NxMainGategory).GetMemberLayers().ToList();
-                    var reultArray = allLayers.Distinct().Except(layers).ToList();
-                    reultArray.Remove(unusedLayer);
-                    if (reultArray.Count < requestLayersCount) throw new Exception("Недостаточно слоев для создания категории");
-                    int z = 0;
-                    int[] freeLayers = new int[requestLayersCount];
-                    for (int i = 0; i < reultArray.Count(); ++i)
-                    {
-                        if (z == requestLayersCount) break;
-                        if (reultArray[i] > maxLayersCount) throw new Exception("Недостаточно свободных слоев без обьектов для создания категории");
-                        if (!workPart.Layers.GetAllObjectsOnLayer(reultArray[i]).Any())
-                        {
-                            freeLayers[z] = reultArray[i];
-                            ++z;
-                            Dispatcher.Invoke(() => { ++ProgressBarCategory.Value; });
-                        }
-                    }
-                    workPart.LayerCategories.CreateCategory(requestCategoryName, "", freeLayers);
-                    Dispatcher.Invoke(() =>
-                    {
-                        updateLayerCategories();
-                        ProgressBarCategory.Value = 0;
-                    });
-                }
-                catch (Exception ex) { Dispatcher.Invoke(() => { MessageBox.Show(ex.Message); ProgressBarCategory.Value = 0; }); }
-            });
-            Thread t = new Thread(new ThreadStart(ts));
-            t.Start();
+
+            List<Category> CategoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
+            threadCategoryCreator.createListCategories(CategoryGroup);
+            //threadCategoryCreator.CreateCategory(requestCategoryName, requestLayersCount);
         }
 
+        //=====================================================================
+        //Настройка контролов при загрузке формы
+        //=====================================================================
         private void NXLayerManager_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -248,9 +221,40 @@ namespace WpfApp3
             }
         }
 
-        public void ResultCallback(string name)
+        //=====================================================================
+        //Методы для кэлбэков
+        //=====================================================================
+        private void progressBarIncrease(Boolean val)
         {
-            Dispatcher.Invoke(()=>CreateCategory.Content = name);
+            if (val) Dispatcher.Invoke(() => ++ProgressBarCategory.Value);
+        }
+
+        private void progressBarReset(Boolean val)
+        {
+            if (val) Dispatcher.Invoke(() =>
+            {
+                updateLayerCategories();
+                ProgressBarCategory.Value = 0;
+            });
+        }
+        private void ExceptionThread(Exception ex) 
+        {
+            Dispatcher.Invoke(() => { MessageBox.Show(ex.Message); ProgressBarCategory.Value = 0; });
+        }
+
+        //=====================================================================
+        //Создать группу категорий в отдельном потоке
+        //=====================================================================
+        private void CreateGroupCategories_Click(object sender, RoutedEventArgs e)
+        {
+            string requestGroupName = InputGroupName.Text;
+            int requestGroupCount = Convert.ToInt32(InputGroupCount.Text);
+            int requestLayersCount = Convert.ToInt32(InputGroupLayersCount.Text);
+            ProgressBarCategory.Maximum = requestLayersCount;
+
+            CategoryConfigurator config = new CategoryConfigurator();
+            List<Category> CategoryGroup = config.getCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
+            threadCategoryCreator.createListCategories(CategoryGroup);
         }
     }
 }
