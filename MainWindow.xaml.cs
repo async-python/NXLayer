@@ -194,7 +194,8 @@ namespace WpfApp3
         {
             try
             {
-                if (InputLayerCount.Text.Length == 0 || Convert.ToInt32(InputLayerCount.Text) == 0) {
+                if (InputLayerCount.Text.Length == 0 || Convert.ToInt32(InputLayerCount.Text) == 0)
+                {
                     throw new Exception("число категорий должно быть больше 0");
                 };
                 string requestCategoryName = InputCategoryName.Text;
@@ -204,7 +205,8 @@ namespace WpfApp3
                 List<Category> CategoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
                 threadCategoryCreator.createListCategories(CategoryGroup);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 MessageBox.Show(ex.Message);
             }
         }
@@ -225,6 +227,26 @@ namespace WpfApp3
                 InputLayerCount.setIntTextBoxBehavior(InputLayerCount.Text);
                 InputGroupCount.setIntTextBoxBehavior(InputGroupCount.Text);
                 InputGroupLayersCount.setIntTextBoxBehavior(InputGroupLayersCount.Text);
+                List<MenuItem> listMenuAdd = new List<MenuItem>();
+                for (int i = 0; i < 10; i++)
+                {
+                    listMenuAdd.Add(new MenuItem());
+                    listMenuAdd[i].Header = (i + 1).ToString();
+                    listMenuAdd[i].StaysOpenOnClick = false;
+                    listMenuAdd[i].Icon = new Image
+                    {
+                        Source = new BitmapImage(new Uri("Resources/plus_icon.ico", UriKind.Relative))
+                    };
+                    listMenuAdd[i].Click += (se, sa) =>
+                    {
+                        var item = ListViewCategories.SelectedItem;
+                        var r = item as Category;
+                        var subitem = se as MenuItem;
+                        //MessageBox.Show(r.Name + " lays: " + subitem.Header);
+                    };
+                    listMenuAdd[i].IsCheckable = false;
+                    MenuItemAdd.Items.Add(listMenuAdd[i]);
+                }
             }
             catch (Exception ex)
             {
@@ -263,7 +285,8 @@ namespace WpfApp3
                     if (InputCategoryName.Text != Singleton.InputTextCategory) CreateCategory.IsEnabled = true;
                     if (InputGroupName.Text != Singleton.InputTextGroup) CreateGroupCategories.IsEnabled = true;
                 }
-                else {
+                else
+                {
                     CreateCategory.IsEnabled = false;
                     CreateGroupCategories.IsEnabled = false;
                 }
@@ -271,9 +294,9 @@ namespace WpfApp3
         }
 
         //=====================================================================
-        //Создать группу категорий в отдельном потоке
+        //Создать категории в отдельном потоке
         //=====================================================================
-        private void CreateGroupCategories_Click(object sender, RoutedEventArgs e) 
+        private void CreateGroupCategories_Click(object sender, RoutedEventArgs e)
         {
             string requestGroupName = InputGroupName.Text;
             int requestGroupCount = Convert.ToInt32(InputGroupCount.Text);
@@ -285,19 +308,66 @@ namespace WpfApp3
             threadCategoryCreator.createListCategories(CategoryGroup);
         }
 
-        public void showMessageBox(object sender, RoutedEventArgs e) {
-            var sitems = ListViewCategories.SelectedItems;
-            int x = sitems.Count;
+        //=====================================================================
+        //Удалить категории
+        //=====================================================================
+        public void deleteCategories(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = ListViewCategories.SelectedItems;
+            int x = selectedItems.Count;
             for (int i = 0; i < x; ++i)
             {
                 var item = ListViewCategories.SelectedItem;
-                var r = item as Category;
-                //MessageBox.Show(r.Name);
-                var t = workPart.LayerCategories.FindObject(r.Name);
-                theSession.UpdateManager.AddToDeleteList(t);
+                var category = item as Category;
+                var NXcategory = workPart.LayerCategories.FindObject(category.Name);
+                theSession.UpdateManager.AddToDeleteList(NXcategory);
                 ListViewCategories.Items.Remove(item);
             }
             updateNxScreen();
+        }
+
+        //=====================================================================
+        //Открытие контекстного меню в основном списке категорий
+        //=====================================================================
+        private void ListViewCategories_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (ListViewCategories.SelectedItems.Count == 0) e.Handled = true;
+            else
+            {
+                MenuItemDel.Items.Clear();
+                var selItems = ListViewCategories.SelectedItems;
+                int selectedItemsCount = ListViewCategories.SelectedItems.Count;
+                List<int> categoryQuantity = new List<int>();
+                for (int i = 0; i < selectedItemsCount; i++)
+                {
+                    var item = selItems[i];
+                    var layCount = (item as Category).LayCount;
+                    categoryQuantity.Add(layCount);
+                }
+                var maxVal = 15;
+                var totalCount = maxVal;
+                if (categoryQuantity.Min() < maxVal) totalCount = categoryQuantity.Min();
+                List<MenuItem> listMenuDel = new List<MenuItem>();
+                for (int i = 0; i < totalCount; i++)
+                {
+                    listMenuDel.Add(new MenuItem());
+                    listMenuDel[i].Header = (i + 1).ToString();
+                    listMenuDel[i].StaysOpenOnClick = false;
+                    listMenuDel[i].Icon = new Image
+                    {
+                        Source = new BitmapImage(new Uri("Resources/minus_icon.ico", UriKind.Relative))
+                    };
+                    listMenuDel[i].Click += (se, sa) =>
+                    {
+                        var item = ListViewCategories.SelectedItem;
+                        var r = item as Category;
+                        var subitem = se as MenuItem;
+                        //MessageBox.Show(r.Name + " lays: " + subitem.Header);
+                    };
+                    listMenuDel[i].IsCheckable = false;
+                    MenuItemDel.Items.Add(listMenuDel[i]);
+                }
+            }
         }
     }
 }

@@ -154,5 +154,11 @@
   <ItemGroup>
     <Resource Include="Resources\delete_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\plus_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\minus_icon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
