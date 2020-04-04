@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using NXOpen;
 using WpfApp3;
 using System.Collections.ObjectModel;
+using WpfApp3.ViewModel;
 
 namespace WpfApp3
 {
@@ -33,8 +34,9 @@ namespace WpfApp3
         private int mMaxLayersCount = 256; //Общее число слоев
         private string mNxMainGategory = "ALL"; //Базовая категория NX, которой принадлежат все слои
         private int mMaxLayersQuantityInSubMenu = 10; //Максимальное количество добавляемых слоев из субменю основного списка категорий
-        private CancellationTokenSource cts;
-        //public List<Category> itemsList = new List<Category>();
+        public ObservableCollection<Category> mDisplayCategoryList { get; set; } 
+            = new ObservableCollection<Category>(); //Список отображаемых категорий в основном окне
+
         //=====================================================================
         //Конструктор класса - родителя
         //=====================================================================
@@ -43,9 +45,7 @@ namespace WpfApp3
             try
             {
                 InitializeComponent();
-                //this.DataContext = itemsList;
                 Singleton.GetInstance();
-                cts = new CancellationTokenSource();
                 mSession = NXOpen.Session.GetSession();
                 mWorkPart = mSession.Parts.Work;
                 mBasePart = mSession.Parts.BaseWork;
@@ -55,14 +55,11 @@ namespace WpfApp3
                     new ProgressBarResetCallback(progressBarReset),
                     new ExceptionCallback(ExceptionThread),
                     new ButtonControlsAccess(buttonAccess),
-                    cts);
+                    new UpdateSingleItem(ItemUpdate),
+                    new AddSingleItem(ItemAddUpdate));
 
-                //ListViewCategories.ItemsSource = itemsList;
-                //itemsList.Add(new Category("sdfsd", 1));
-                //ListViewCategories.ItemsSource = itemsList;
-
-                //updateItemList();
-                updateLayerCategories();
+                this.DataContext = new MainWindowViewModel(mDisplayCategoryList);
+                updateItemList();
             }
             catch (Exception ex)
             {
@@ -70,15 +67,67 @@ namespace WpfApp3
             }
         }
 
+        //=====================================================================
+        //Обновить отдельную категорию в списке категорий приложения
+        //=====================================================================
+        private void updateSingleCategoryInList(string name)
+        {
+            var category = mWorkPart.LayerCategories.FindObject(name);
+            foreach (Category x in mDisplayCategoryList)
+            {
+                if (x.Name == name)
+                {
+                    x.LayCount = category.GetMemberLayers().Length;
+                    //MessageBox.Show("updated");
+                }
+
+            }
+        }
+
+        //=====================================================================
+        //Добавить категории в список категорий приложения
+        //=====================================================================
+        private void addGroupCategoriesToList(Boolean val)
+        {
+            try
+            {
+                if (val)
+                {
+                    List<Category> newList = new List<Category>();
+                    mNxCategories = mWorkPart.LayerCategories.ToArray();
+                    var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == mNxMainGategory).ToList();
+                    tempArray.ForEach(g =>
+                    {
+                        if (g.Name != mNxMainGategory) newList.Add(new Category(g.Name, g.GetMemberLayers().Count()));
+                    });
+                    int difference = newList.Count - mDisplayCategoryList.Count;
+                    if (difference < 0) throw new Exception("addGroupCategoriesToList() difference < 0");
+                    for (int i = newList.Count - difference; i < newList.Count; ++i)
+                    {
+                        mDisplayCategoryList.Add(newList[i]);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+        //=====================================================================
+        //Синхронизация списка категорий в приложении со списком категорий в NX
+        //=====================================================================
         private void updateItemList()
         {
             try
             {
+                mDisplayCategoryList.Clear();
                 mNxCategories = mWorkPart.LayerCategories.ToArray();
                 var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == mNxMainGategory).ToList();
                 tempArray.ForEach(g =>
                 {
-                    if (g.Name != mNxMainGategory) ListViewCategories.Items.Add(new Category(g.Name, g.GetMemberLayers().Count()));
+                    if (g.Name != mNxMainGategory) mDisplayCategoryList.Add(new Category(g.Name, g.GetMemberLayers().Count()));
                 });
             }
             catch (Exception ex)
@@ -116,30 +165,6 @@ namespace WpfApp3
         }
 
         //=====================================================================
-        //Преобразование категорий NXopen для bindable представления
-        //=====================================================================
-
-        private List<Category> transformNxCategories()
-        {
-            List<Category> categoryArray = new List<Category>();
-            mNxCategories = mWorkPart.LayerCategories.ToArray();
-            var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == mNxMainGategory).ToList();
-            tempArray.ForEach(g =>
-            {
-                if (g.Name != mNxMainGategory) categoryArray.Add(new Category(g.Name, g.GetMemberLayers().Count()));
-            });
-            return categoryArray;
-        }
-        //=====================================================================
-        //Обновление списка категорий на экране
-        //=====================================================================
-        public void updateLayerCategories()
-        {
-            ListViewCategories.Items.Clear();
-            List<Category> CatArray = transformNxCategories();
-            CatArray.ForEach(g => ListViewCategories.Items.Add(g));
-        }
-        //=====================================================================
         //Удалить текущий список категорий
         //=====================================================================
         private void DeleteButton_CLick(object sender, RoutedEventArgs e)
@@ -157,7 +182,7 @@ namespace WpfApp3
             {
                 mSession.UpdateManager.AddToDeleteList(X);
                 updateNxScreen();
-                updateLayerCategories();
+                updateItemList();
             }
         }
 
@@ -194,7 +219,7 @@ namespace WpfApp3
                     mWorkPart.LayerCategories.CreateCategory(X.Name, "", arr);
                 }
                 updateNxScreen();
-                updateLayerCategories();
+                updateItemList();
             }
             catch (Exception ex)
             {
@@ -207,8 +232,6 @@ namespace WpfApp3
         //=====================================================================
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //System.Environment.Exit(1);
-            //cts.Cancel();
             this.Close();
         }
 
@@ -273,7 +296,8 @@ namespace WpfApp3
         {
             if (val) Dispatcher.Invoke(() =>
             {
-                updateLayerCategories();
+                //updateLayerCategories();
+                //updateItemList();
                 ProgressBarCategory.Value = 0;
             });
         }
@@ -297,6 +321,16 @@ namespace WpfApp3
                     CreateGroupCategories.IsEnabled = false;
                 }
             });
+        }
+
+        private void ItemUpdate(string name)
+        {
+            Dispatcher.Invoke(() => { updateSingleCategoryInList(name); });
+        }
+
+        private void ItemAddUpdate(Boolean val)
+        {
+            Dispatcher.Invoke(() => { addGroupCategoriesToList(val); });
         }
 
         //=====================================================================
@@ -327,7 +361,7 @@ namespace WpfApp3
                 var category = item as Category;
                 var NXcategory = mWorkPart.LayerCategories.FindObject(category.Name);
                 mSession.UpdateManager.AddToDeleteList(NXcategory);
-                ListViewCategories.Items.Remove(item);
+                mDisplayCategoryList.Remove(category);
             }
             updateNxScreen();
         }
@@ -410,7 +444,7 @@ namespace WpfApp3
                     }
                     nxCategory.SetMemberLayers(newLayers);
                 });
-                updateLayerCategories();
+                updateItemList();
                 updateNxScreen();
             }
             catch (Exception ex)
@@ -448,13 +482,6 @@ namespace WpfApp3
                 MessageBox.Show(ex.Message);
             }
             //MessageBox.Show($"add {addLayersQuantity}");
-        }
-
-        private void NXLayerManager_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            //Thread t = Thread.CurrentThread; 
-            //ThreadState threadState = new ThreadState();
-            //if (t.IsAlive) e.Cancel = true;
         }
     }
 }

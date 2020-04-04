@@ -1,49 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using WpfApp3.ViewModel;
 
 namespace WpfApp3
 {
+    public class CategoryList
+    {
+        public ObservableCollection<Category> List { get; set; } = new ObservableCollection<Category>();
+    }
     //=====================================================================
     //Класс шаблон параметров категории слоев
     //=====================================================================
-    public class Category //: INotifyPropertyChanged
+    public class Category : INotifyPropertyChanged
     {
-        public Category() { }
+        private string name;
+        private int laycount;
 
+        public Category() { }
         public Category(string Name, int LayCount)
         {
-            this.Name = Name;
-            this.LayCount = LayCount;
+            this.name = Name;
+            this.laycount = LayCount;
         }
-        public string Name { set; get; }
-        /*{
-            get => Name;
-            set
-            {
-                Name = value;
-                //NotifyPropertyChanged();
-            }
-        }*/ //Имя категории
-        public int LayCount { set; get; }
-        /*{
-            get => LayCount;
-            set
-            {
-                LayCount = value;
-                //NotifyPropertyChanged();
-            }
-        }*/ //Количество слоев в категории
 
-        /*private void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        public string Name 
+        {
+            set 
+            { 
+                name = value;
+                OnPropertyChanged(nameof(name));
+            }
+
+            get { return name; }
+        }
+
+        public int LayCount 
+        {
+            set 
+            { 
+                laycount = value;
+                OnPropertyChanged(nameof(LayCount));
+            }
+            get { return laycount; }
+        }
+
+        protected virtual void OnPropertyChanged(string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        public event PropertyChangedEventHandler PropertyChanged;*/
+        public event PropertyChangedEventHandler PropertyChanged;
     }
     //=====================================================================
     //Класс шаблон параметров групп категорий

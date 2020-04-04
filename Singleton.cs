@@ -13,9 +13,10 @@ namespace WpfApp3
         public string Date { get; private set; }
         public const string InputTextCategory = "введите имя категории";
         public const string InputTextGroup = "введите имя группы";
-
+        public static object locker;
         private Singleton()
         {
+            locker = new object();
             Date = System.DateTime.Now.TimeOfDay.ToString();
         }
 

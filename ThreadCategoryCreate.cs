@@ -13,6 +13,7 @@ namespace WpfApp3
 {
     public class ThreadCategoryCreate
     {
+        private bool threadStarted = false;
         private NXOpen.Session theSession;
         private NXOpen.Part workPart;
 
@@ -21,19 +22,26 @@ namespace WpfApp3
         private ProgressBarResetCallback resetCallback; //Обнуление прогрессбара
         private ExceptionCallback exCallback; //Вывод сообщения ошибки в основной поток
         private ButtonControlsAccess btCallback; //Активация и деактивация кнопок управления
-        private CancellationTokenSource cts;
+        private UpdateSingleItem updCallback;
+        private AddSingleItem addCalback;
 
         private const string NxMainGategory = "ALL";
         private const int unusedLayer = 1;
         private const int maxLayersCount = 256;
-        private static object locker = new object();
+        public static object locker = Singleton.locker;
+
+        public bool getThreadState()
+        {
+            return threadStarted;
+        }
 
         public ThreadCategoryCreate(
             ProgressBarIncreaseCallback cback,
             ProgressBarResetCallback rback,
             ExceptionCallback eback,
             ButtonControlsAccess bback,
-            CancellationTokenSource cancellationTokenSource)
+            UpdateSingleItem updback,
+            AddSingleItem addback)
         {
             theSession = NXOpen.Session.GetSession();
             workPart = theSession.Parts.Work;
@@ -42,7 +50,8 @@ namespace WpfApp3
             resetCallback = rback;
             exCallback = eback;
             btCallback = bback;
-            cts = cancellationTokenSource;
+            updCallback = updback;
+            addCalback = addback;
         }
 
         //=====================================================================
@@ -50,40 +59,49 @@ namespace WpfApp3
         //=====================================================================
         public void createListCategories(List<Category> Group)
         {
-            ThreadStart ts = new ThreadStart(() =>
+            try
             {
-                try
+                ThreadStart ts = new ThreadStart(() =>
+            {
+                lock (locker)
                 {
-                    lock (locker)
+                    threadStarted = true;
+                    btCallback(false);
+                    if (Group.Count == 0) throw new Exception("Количество категорий меньше 1");
+                    var currentCategoryList = workPart.LayerCategories.ToArray().ToList();
+                    int requestLayersCount = 0;
+                    Group.ForEach(x =>
                     {
-                        btCallback(false);
-                        if (Group.Count == 0) throw new Exception("Количество категорий меньше 1");
-                        var currentCategoryList = workPart.LayerCategories.ToArray().ToList();
-                        int requestLayersCount = 0;
-                        Group.ForEach(x =>
+                        currentCategoryList.ForEach(element =>
                         {
-                            currentCategoryList.ForEach(element =>
-                            {
-                                if (element.Name == x.Name) throw new Exception("Имя категории уже существует");
-                            });
-                            requestLayersCount += x.LayCount;
+                            if (element.Name == x.Name) throw new Exception("Имя категории уже существует");
                         });
-                        int[] freeLayers = getLayersWithoutObjects(requestLayersCount);
-                        List<int[]> apartedLayers = getApartedArray(freeLayers, Group.Count);
-                        if (apartedLayers.Count != Group.Count) throw new Exception("ошибка сравнения массивов в функции createListCategories");
-                        Group.ForEach(x =>
-                        {
-                            workPart.LayerCategories.CreateCategory(x.Name, "", apartedLayers[Group.IndexOf(x)]);
-                        });
-                        resetCallback(true);
-                        btCallback(true);
-                    }
+                        requestLayersCount += x.LayCount;
+                    });
+                    int[] freeLayers = getLayersWithoutObjects(requestLayersCount);
+                    List<int[]> apartedLayers = getApartedArray(freeLayers, Group.Count);
+                    if (apartedLayers.Count != Group.Count) throw new Exception("ошибка сравнения массивов в функции createListCategories");
+                    Group.ForEach(x =>
+                    {
+                        workPart.LayerCategories.CreateCategory(x.Name, "", apartedLayers[Group.IndexOf(x)]);
+                    });
+                    addCalback(true);
+                    resetCallback(true);
+                    btCallback(true);
+                    threadStarted = false;
                 }
-                catch (Exception ex) { exCallback(ex); }
             });
-            Thread t = new Thread(new ThreadStart(ts));
-            t.IsBackground = false;
-            t.Start();
+                Thread t = new Thread(new ThreadStart(ts));
+                t = new Thread(new ThreadStart(ts));
+                t.SetApartmentState(ApartmentState.STA);
+                t.IsBackground = true;
+                t.Start();
+            }
+            catch (ThreadAbortException ex)
+            {
+
+            }
+            catch (Exception ex) { exCallback(ex); }
         }
 
         //=====================================================================
@@ -123,36 +141,46 @@ namespace WpfApp3
         //=====================================================================
         public void addLayersToExistCategory(List<string> names, int layersQuantity)
         {
-            ThreadStart ts = new ThreadStart(() =>
+            try
             {
-                try
+                ThreadStart ts = new ThreadStart(() =>
+            {
+
+                lock (locker)
                 {
-                    lock (locker)
+                    threadStarted = true;
+                    btCallback(false);
+                    int totalLayersRequest = layersQuantity * names.Count;
+                    int[] freeLayers = getLayersWithoutObjects(totalLayersRequest);
+                    List<int[]> freeLayersGroups = getApartedArray(freeLayers, names.Count);
+                    for (int i = 0; i < names.Count; ++i)
                     {
-                        btCallback(false);
-                        int totalLayersRequest = layersQuantity * names.Count;
-                        int[] freeLayers = getLayersWithoutObjects(totalLayersRequest);
-                        List<int[]> freeLayersGroups = getApartedArray(freeLayers, names.Count);
-                        for (int i = 0; i < names.Count; ++i)
-                        {
-                            var category = workPart.LayerCategories.FindObject(names[i]);
-                            var currentLayers = category.GetMemberLayers().ToList().Concat(freeLayersGroups[i].ToList());
-                            category.SetMemberLayers(currentLayers.ToArray());
-                        }
-                        resetCallback(true);
-                        btCallback(true);
-                        //Thread.Sleep(500);
+                        var category = workPart.LayerCategories.FindObject(names[i]);
+                        var currentLayers = category.GetMemberLayers().ToList().Concat(freeLayersGroups[i].ToList());
+                        category.SetMemberLayers(currentLayers.ToArray());
+                        updCallback(category.Name);
                     }
-                }
-                catch (Exception ex) { 
-                    exCallback(ex);
                     resetCallback(true);
                     btCallback(true);
+                    threadStarted = false;
                 }
+
             });
-            Thread t = new Thread(new ThreadStart(ts));
-            t.IsBackground = false;
-            t.Start();
+                Thread t = new Thread(new ThreadStart(ts));
+                t.SetApartmentState(ApartmentState.STA);
+                t.IsBackground = true;
+                t.Start();
+            }
+            catch (ThreadAbortException ex)
+            {
+
+            }
+            catch (Exception ex)
+            {
+                exCallback(ex);
+                resetCallback(true);
+                btCallback(true);
+            }
         }
 
         //=====================================================================
@@ -194,4 +222,6 @@ namespace WpfApp3
     public delegate void ProgressBarResetCallback(Boolean val);
     public delegate void ExceptionCallback(Exception ex);
     public delegate void ButtonControlsAccess(Boolean val);
+    public delegate void UpdateSingleItem(string name);
+    public delegate void AddSingleItem(Boolean val);
 }

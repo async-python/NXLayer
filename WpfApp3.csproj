@@ -89,6 +89,8 @@
   <ItemGroup>
     <Compile Include="Singleton.cs" />
     <Compile Include="ThreadCategoryCreate.cs" />
+    <Compile Include="ViewModel\BaseViewModel.cs" />
+    <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <None Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
