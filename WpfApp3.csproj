@@ -162,5 +162,8 @@
   <ItemGroup>
     <Resource Include="Resources\minus_icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\copy_icon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

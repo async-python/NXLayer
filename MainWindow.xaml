@@ -17,10 +17,36 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ListView x:Name="ListViewCategories" Margin="3" ContextMenuOpening="ListViewCategories_ContextMenuOpening" ItemsSource="{Binding CategoryList}">
+            <ListView x:Name="ListViewCategories" Margin="3" ContextMenuOpening="ListViewCategories_ContextMenuOpening" ItemsSource="{Binding CategoryList}" AlternationCount="2">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <Trigger Property="ItemsControl.AlternationIndex" Value="1">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderThickness" Value="1"/>
+                                <Setter Property="BorderBrush" Value="SkyBlue"/>
+                                <Setter Property="Background" Value="#FFC5E4EE"/>
+                            </Trigger>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="Background" Value="SkyBlue"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem x:Name="MenuItemAdd" Header="Добавить слои" HorizontalContentAlignment="Center">
+                        <MenuItem x:Name="MenuItemAdd" Header="Добавить слои" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                             <MenuItem.Icon>
                                 <Image Source="Resources\plus_icon.ico"></Image>
                             </MenuItem.Icon>
@@ -33,6 +59,11 @@
                         <MenuItem Header="Удалить категорию" Click="deleteAllCategories">
                             <MenuItem.Icon>
                                 <Image Source="Resources\delete_icon.ico"></Image>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="Копировать имя" Command="ApplicationCommands.Copy">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\copy_icon.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
                     </ContextMenu>
@@ -73,4 +104,10 @@
         </Grid>
 
     </Grid>
+    <Window.CommandBindings>
+        <CommandBinding
+        Command="ApplicationCommands.Copy"
+        CanExecute="CommandBinding_CanExecute"
+        Executed="CommandBinding_Executed"/>
+    </Window.CommandBindings>
 </Window>

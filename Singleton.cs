@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NXOpen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,10 +14,11 @@ namespace WpfApp3
         public string Date { get; private set; }
         public const string InputTextCategory = "введите имя категории";
         public const string InputTextGroup = "введите имя группы";
-        public static object locker;
+        public const string NxMainGategory = "ALL";
+        public const int WorkLayer = 1;
+        public const int maxLayersCount = 256;
         private Singleton()
         {
-            locker = new object();
             Date = System.DateTime.Now.TimeOfDay.ToString();
         }
 
