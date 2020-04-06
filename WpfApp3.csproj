@@ -103,7 +103,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Category.cs" />
-    <Compile Include="Extension.cs" />
+    <Compile Include="ViewModel\Extension.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -164,6 +164,27 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\copy_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\vir_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\del_nobjects.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\add_lay.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\rad_icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\rec_full.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\rec_empty.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\del_remov.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

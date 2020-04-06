@@ -227,6 +227,56 @@ namespace WpfApp3
             catch (ThreadAbortException) { }
             catch (Exception) { }
         }
+
+        public void ClearLayers(List<Category> group, int val)
+        {
+            try
+            {
+                ThreadStart ts = new ThreadStart(() =>
+                {
+                    try
+                    {
+                        lock (mLocker)
+                        {
+                            List<NXOpen.Layer.Category> categories = new List<NXOpen.Layer.Category>();
+                            group.ForEach(x =>
+                            {
+                                var item = mWorkPart.LayerCategories.FindObject(x.Name);
+                                if (item != null) categories.Add(item);
+                            });
+                            categories.ForEach(x =>
+                            {
+                                int quantity = x.GetMemberLayers().Length;
+                                List<int> layers = new List<int>();
+                                List<int> memberLayers = x.GetMemberLayers().ToList();
+                                memberLayers.ForEach(z =>
+                                {
+                                    switch (val)
+                                    {
+                                        case 0:
+                                            if (mWorkPart.Layers.GetAllObjectsOnLayer(z).Length != 0) layers.Add(z);
+                                            break;
+                                        case 1:
+                                            if (mWorkPart.Layers.GetAllObjectsOnLayer(z).Length == 0) layers.Add(z);
+                                            break;
+                                    }
+                                });
+                                x.SetMemberLayers(layers.ToArray());
+                                updateCategoriesCallback(x.Name);
+                            });
+                        }
+                    }
+                    catch (ThreadAbortException) { }
+                    catch (Exception) { }
+                });
+                currentThread = new Thread(ts);
+                currentThread.SetApartmentState(ApartmentState.STA);
+                currentThread.IsBackground = true;
+                currentThread.Start();
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception) { }
+        }
     }
 
     //=====================================================================

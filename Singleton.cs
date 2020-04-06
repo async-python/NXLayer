@@ -11,16 +11,12 @@ namespace WpfApp3
     {
         private static readonly Singleton instance = new Singleton();
 
-        public string Date { get; private set; }
         public const string InputTextCategory = "введите имя категории";
         public const string InputTextGroup = "введите имя группы";
         public const string NxMainGategory = "ALL";
         public const int WorkLayer = 1;
         public const int maxLayersCount = 256;
-        private Singleton()
-        {
-            Date = System.DateTime.Now.TimeOfDay.ToString();
-        }
+        private Singleton() { }
 
         public static Singleton GetInstance()
         {

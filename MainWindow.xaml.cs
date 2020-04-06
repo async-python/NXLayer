@@ -94,6 +94,7 @@ namespace WpfApp3
                 {
                     mDisplayCategoryList.Add(x);
                 });
+                updateItemList();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -537,6 +538,44 @@ namespace WpfApp3
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void MenuDelEmpty_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<Category> items = getSelectedCategories();
+                mThreadCategoryCreator.ClearLayers(items, 0);
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private void MenuDelFull_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<Category> items = getSelectedCategories();
+                mThreadCategoryCreator.ClearLayers(items, 1);
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+        }
+
+        private List<Category> getSelectedCategories()
+        {
+            List<Category> items = new List<Category>();
+            try
+            {
+                var temp = ListViewCategories.SelectedItems;
+                foreach (var x in temp)
+                {
+                    items.Add(x as Category);
+                }
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
+            return items;
         }
     }
 }

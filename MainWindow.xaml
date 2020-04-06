@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp3"
         mc:Ignorable="d"
-        Title="NX Layer Manager" Height="624" Width="520" ResizeMode="NoResize" Topmost="True" Margin="2" WindowStyle="ThreeDBorderWindow" Loaded="NXLayerManager_Loaded">
+        Title="NX Layer Manager" Height="624" Width="520" ResizeMode="NoResize" Topmost="True" Margin="2" WindowStyle="ThreeDBorderWindow" Loaded="NXLayerManager_Loaded" Icon="Resources\rad_icon.ico">
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition/>
@@ -46,14 +46,24 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem x:Name="MenuItemAdd" Header="Добавить слои" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        <MenuItem x:Name="MenuItemAdd" Header="Добавить пустые слои" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                             <MenuItem.Icon>
-                                <Image Source="Resources\plus_icon.ico"></Image>
+                                <Image Source="Resources\add_lay.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
                         <MenuItem x:Name="MenuItemDel" Header="Убрать слои">
                             <MenuItem.Icon>
-                                <Image Source="Resources\minus_icon.ico"></Image>
+                                <Image Source="Resources\del_nobjects.ico"></Image>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem x:Name="MenuDelEmpty" Header="Убрать пустые слои" Click="MenuDelEmpty_Click">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\rec_empty.ico"></Image>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem x:Name="MenuDelFull" Header="Убрать слои с объектами" Click="MenuDelFull_Click">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\rec_full.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
                         <MenuItem Header="Удалить категорию" Click="deleteAllCategories">
