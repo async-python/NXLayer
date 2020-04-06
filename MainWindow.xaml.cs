@@ -27,8 +27,8 @@ namespace WpfApp3
         private ThreadCategoryCreate mThreadCategoryCreator;
         private Session mSession;
         private Part mWorkPart;
-        private NXOpen.BasePart mBasePart;
-        private NXOpen.Part mDisplayPart;
+        private BasePart mBasePart;
+        private Part mDisplayPart;
         private NXOpen.Layer.Category[] mNxCategories;
         private int mWorkLayer = Singleton.WorkLayer; //Неиспользуемый рабочий слой
         private int mMaxLayersCount = Singleton.maxLayersCount; //Общее число слоев
@@ -187,7 +187,7 @@ namespace WpfApp3
         {
             try
             {
-                NXOpen.Session.UndoMarkId id = mSession.NewestVisibleUndoMark;
+                var id = mSession.NewestVisibleUndoMark;
                 mSession.UpdateManager.DoUpdate(id);
                 mSession.DeleteUndoMark(id, null);
             }
@@ -576,6 +576,22 @@ namespace WpfApp3
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
             return items;
+        }
+
+        private void MenuItemDelAll_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<Category> selItems = getSelectedCategories();
+                selItems.ForEach(x =>
+                {
+                    var category = mWorkPart.LayerCategories.FindObject(x.Name);
+                    category.SetMemberLayers(new int[0]);
+                    updateSingleCategoryInList(x.Name);
+                });
+            }
+            catch (ThreadAbortException) { }
+            catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
     }
 }

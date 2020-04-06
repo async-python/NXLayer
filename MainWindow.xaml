@@ -53,6 +53,11 @@
                         </MenuItem>
                         <MenuItem x:Name="MenuItemDel" Header="Убрать слои">
                             <MenuItem.Icon>
+                                <Image Source="Resources\del_remov.ico"></Image>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem x:Name="MenuItemDelAll" Header="Убрать все слои" Click="MenuItemDelAll_Click">
+                            <MenuItem.Icon>
                                 <Image Source="Resources\del_nobjects.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
