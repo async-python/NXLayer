@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -8,12 +9,12 @@ using WpfApp3;
 
 namespace WpfApp3.ViewModel
 {
-    class MainWindowViewModel : BaseViewModel
+    class MainWindowViewModel : BindableBase
     {
         public ObservableCollection<Category> CategoryList { get; set; }
         public MainWindowViewModel(ObservableCollection<Category> List)
         {
-            CategoryList = List; // { mDisplayCategoryList = { new Category("Alex", 1), new Category("Alex", 2) } };
+            CategoryList = List;
         }
     }
 }

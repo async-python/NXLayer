@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Prism.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -17,7 +18,7 @@ namespace WpfApp3
     //=====================================================================
     //Класс шаблон параметров категории слоев
     //=====================================================================
-    public class Category : INotifyPropertyChanged
+    public class Category : BindableBase
     {
         private string name;
         private int laycount;
@@ -34,7 +35,7 @@ namespace WpfApp3
             set 
             { 
                 name = value;
-                OnPropertyChanged(nameof(name));
+                RaisePropertyChanged(nameof(name));
             }
 
             get { return name; }
@@ -45,16 +46,10 @@ namespace WpfApp3
             set 
             { 
                 laycount = value;
-                OnPropertyChanged(nameof(LayCount));
+                RaisePropertyChanged(nameof(LayCount));
             }
             get { return laycount; }
         }
-
-        protected virtual void OnPropertyChanged(string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
     }
     //=====================================================================
     //Класс шаблон параметров групп категорий
