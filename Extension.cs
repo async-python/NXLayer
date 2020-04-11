@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace WpfApp3
+namespace NXLM
 {
     //=====================================================================
     //Расширения для стандартных контролов
@@ -18,9 +13,9 @@ namespace WpfApp3
         /*Расширение для TextBox принимающего строковые значения:
         Расширение отображает строку приглашения ввода, и управляет состояниями поля ввода и связанной кнопки
         в зависимости от содержимого поля ввода*/
-        public static void setStringTextBoxBehavior(this TextBox textBox, string defaultMessage, Button relativeButton)
+        public static void SetStringTextBoxBehavior(this TextBox textBox, string defaultMessage, Button relativeButton)
         {
-            string Message = defaultMessage; //Текст приглашения ввода текста в TwxtBox
+            string message = defaultMessage; //Текст приглашения ввода текста в TwxtBox
             string nullString = ""; //Пустой текст
             int zero = 0; //Ну тут очевидно
             SolidColorBrush colorBlack = Brushes.Black; //Цвет активного текста
@@ -36,13 +31,13 @@ namespace WpfApp3
                 }
             };
 
-            textBox.MouseEnter += (se, ea) => {if (textBox.Text == Message) textBox.Text = nullString;};
+            textBox.MouseEnter += (se, ea) => {if (textBox.Text == message) textBox.Text = nullString;};
 
             textBox.LostFocus += (se, ea) => 
             {
                 if (textBox.Text.Length == zero)
                 {
-                    textBox.Text = Message;
+                    textBox.Text = message;
                     textBox.Foreground = colorLightGray; 
                 }
             };
@@ -51,14 +46,14 @@ namespace WpfApp3
             {
                 if (textBox.Text.Length == zero && !textBox.IsSelectionActive) 
                 {
-                        textBox.Text = Message;
+                        textBox.Text = message;
                         textBox.Foreground = colorLightGray;
                         relativeButton.IsEnabled = false;
                 } 
             };
         }
 
-        public static void setIntTextBoxBehavior(this TextBox textBox, string defaulValue)
+        public static void SetIntTextBoxBehavior(this TextBox textBox, string defaulValue)
         {
             int textBoxLenght = 3; //Максимальная длина поля ввода
             textBox.MaxLength = textBoxLenght;

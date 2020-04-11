@@ -1,42 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
+using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Windows.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using NXLM.ViewModel;
 using NXOpen;
-using WpfApp3;
-using System.Collections.ObjectModel;
-using WpfApp3.ViewModel;
 
-namespace WpfApp3
+namespace NXLM
 {
     public partial class MainWindow : Window
     {
-        private ThreadCategoryCreate mThreadCategoryCreator;
-        private Session mSession;
-        private Part mWorkPart;
+        private readonly ThreadCategoryCreate mThreadCategoryCreator;
+        private readonly Session mSession;
+        private readonly Part mWorkPart;
         private BasePart mBasePart;
         private Part mDisplayPart;
         private NXOpen.Layer.Category[] mNxCategories;
-        private int mWorkLayer = Singleton.WorkLayer; //Неиспользуемый рабочий слой
-        private int mMaxLayersCount = Singleton.maxLayersCount; //Общее число слоев
-        private string mNxMainGategory = Singleton.NxMainGategory; //Базовая категория NX, которой принадлежат все слои
-        private int mMaxLayersQuantityInSubMenu = 10; //Максимальное количество добавляемых слоев из субменю основного списка категорий
+        private const int WorkLayer = Singleton.WorkLayer; //Неиспользуемый рабочий слой
+        private const int MaxLayersCount = Singleton.MaxLayersCount; //Общее число слоев
+        private const string NxMainCategory = Singleton.NxMainCategory; //Базовая категория NX, которой принадлежат все слои
+        private const int MaxLayersQuantityInSubMenu = 10; //Максимальное количество добавляемых слоев из субменю основного списка категорий
 
         //Список отображаемых категорий с количеством слоев в основном окне приложения
-        public ObservableCollection<Category> mDisplayCategoryList { get; set; }
+        public ObservableCollection<Category> DisplayCategoryList { get; set; }
             = new ObservableCollection<Category>();
 
         //=====================================================================
@@ -53,14 +44,11 @@ namespace WpfApp3
                 mBasePart = mSession.Parts.BaseWork;
                 mDisplayPart = mSession.Parts.Display;
                 mThreadCategoryCreator = new ThreadCategoryCreate(
-                    new ProgressBarIncreaseCallback(progressBarIncrease),
-                    new ProgressBarResetCallback(progressBarReset),
-                    new ExceptionCallback(ExceptionThread),
-                    new ButtonControlsAccess(buttonAccess),
-                    new UpdateDisplayCategories(ItemUpdate),
-                    new UpdateLayersQuantity(ItemAddUpdate));
-                this.DataContext = new MainWindowViewModel(mDisplayCategoryList);
-                updateItemList();
+                    ProgressBarIncrease, ProgressBarReset,
+                    ExceptionThread, ButtonAccess,
+                    ItemUpdate, ItemAddUpdate);
+                this.DataContext = new MainWindowViewModel(DisplayCategoryList);
+                UpdateItemList();
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
@@ -69,12 +57,12 @@ namespace WpfApp3
         //Обновить информацию по количеству слоев в категории в списке приложения
         //mDisplayCategoryList
         //=====================================================================
-        private void updateSingleCategoryInList(string name)
+        private void UpdateSingleCategoryInList(string name)
         {
             try
             {
                 var category = mWorkPart.LayerCategories.FindObject(name);
-                foreach (Category x in mDisplayCategoryList)
+                foreach (var x in DisplayCategoryList)
                 {
                     if (x.Name == name) { x.LayCount = category.GetMemberLayers().Length; }
                 }
@@ -86,15 +74,15 @@ namespace WpfApp3
         //=====================================================================
         //Добавить категории в список категорий приложения
         //=====================================================================
-        private void addGroupCategoriesToList(List<Category> Group)
+        private void AddGroupCategoriesToList(List<Category> @group)
         {
             try
             {
-                Group.ForEach(x =>
+                @group.ForEach(x =>
                 {
-                    mDisplayCategoryList.Add(x);
+                    DisplayCategoryList.Add(x);
                 });
-                updateItemList();
+                UpdateItemList();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -103,16 +91,16 @@ namespace WpfApp3
         //=====================================================================
         //Синхронизация списка категорий в приложении со списком категорий в NX
         //=====================================================================
-        private void updateItemList()
+        private void UpdateItemList()
         {
             try
             {
-                mDisplayCategoryList.Clear();
+                DisplayCategoryList.Clear();
                 mNxCategories = mWorkPart.LayerCategories.ToArray();
-                var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == mNxMainGategory).ToList();
+                var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == NxMainCategory).ToList();
                 tempArray.ForEach(g =>
                 {
-                    if (g.Name != mNxMainGategory) mDisplayCategoryList.Add(new Category(g.Name, g.GetMemberLayers().Count()));
+                    if (g.Name != NxMainCategory) DisplayCategoryList.Add(new Category(g.Name, g.GetMemberLayers().Count()));
                 });
             }
             catch (ThreadAbortException) { }
@@ -129,8 +117,10 @@ namespace WpfApp3
         {
             try
             {
-                MainWindow myForm = new MainWindow();
-                myForm.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                var myForm = new MainWindow
+                {
+                    WindowStartupLocation = WindowStartupLocation.CenterScreen
+                };
                 Application app = new App();
                 app.ShutdownMode = ShutdownMode.OnLastWindowClose;
                 app.Run(myForm);
@@ -155,7 +145,7 @@ namespace WpfApp3
         {
             try
             {
-                deleteCurrentCategories();
+                DeleteCurrentCategories();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -164,16 +154,16 @@ namespace WpfApp3
         //=====================================================================
         //Удалить текущий список категорий
         //=====================================================================
-        private void deleteCurrentCategories()
+        private void DeleteCurrentCategories()
         {
             try
             {
                 mNxCategories = mWorkPart.LayerCategories.ToArray();
-                foreach (NXOpen.Layer.Category X in mNxCategories)
+                foreach (var x in mNxCategories)
                 {
-                    mSession.UpdateManager.AddToDeleteList(X);
-                    updateNxScreen();
-                    updateItemList();
+                    mSession.UpdateManager.AddToDeleteList(x);
+                    UpdateNxScreen();
+                    UpdateItemList();
                 }
             }
             catch (ThreadAbortException) { }
@@ -183,7 +173,7 @@ namespace WpfApp3
         //=====================================================================
         //Обновить экран NX
         //=====================================================================
-        private void updateNxScreen()
+        private void UpdateNxScreen()
         {
             try
             {
@@ -202,23 +192,23 @@ namespace WpfApp3
         {
             try
             {
-                deleteCurrentCategories();
-                CategoryConfigurator config = new CategoryConfigurator();
-                List<Category> GroupTemplate = config.getGroupTemplate();
-                int laynumber = mWorkLayer + 1;
-                foreach (Category X in GroupTemplate)
+                DeleteCurrentCategories();
+                var config = new CategoryConfigurator();
+                var groupTemplate = config.GetGroupTemplate();
+                var layerNumber = WorkLayer + 1;
+                foreach (var x in groupTemplate)
                 {
-                    int[] arr = new int[X.LayCount];
-                    for (int i = 0; i < arr.Count(); ++i)
+                    var arr = new int[x.LayCount];
+                    for (var i = 0; i < arr.Count(); ++i)
                     {
-                        if (laynumber == mMaxLayersCount) throw new Exception("Недостаточно количества слоев");
-                        arr[i] = laynumber;
-                        ++laynumber;
+                        if (layerNumber == MaxLayersCount) throw new Exception("Недостаточно количества слоев");
+                        arr[i] = layerNumber;
+                        ++layerNumber;
                     }
-                    mWorkPart.LayerCategories.CreateCategory(X.Name, "", arr);
+                    mWorkPart.LayerCategories.CreateCategory(x.Name, "", arr);
                 }
-                updateNxScreen();
-                updateItemList();
+                UpdateNxScreen();
+                UpdateItemList();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -247,13 +237,14 @@ namespace WpfApp3
                 if (InputLayerCount.Text.Length == 0 || Convert.ToInt32(InputLayerCount.Text) == 0)
                 {
                     throw new Exception("число категорий должно быть больше 0");
-                };
-                string requestCategoryName = InputCategoryName.Text;
-                int requestLayersCount = Convert.ToInt32(InputLayerCount.Text);
+                }
+
+                var requestCategoryName = InputCategoryName.Text;
+                var requestLayersCount = Convert.ToInt32(InputLayerCount.Text);
                 ProgressBarCategory.Maximum = requestLayersCount;
 
-                List<Category> CategoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
-                mThreadCategoryCreator.createListCategories(CategoryGroup);
+                var categoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
+                mThreadCategoryCreator.CreateListCategories(categoryGroup);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -270,12 +261,12 @@ namespace WpfApp3
                 InputGroupName.Text = Singleton.InputTextGroup;
                 InputCategoryName.Foreground = Brushes.LightGray;
                 InputGroupName.Foreground = Brushes.LightGray;
-                InputCategoryName.setStringTextBoxBehavior(InputCategoryName.Text, CreateCategory);
-                InputGroupName.setStringTextBoxBehavior(InputGroupName.Text, CreateGroupCategories);
-                InputLayerCount.setIntTextBoxBehavior(InputLayerCount.Text);
-                InputGroupCount.setIntTextBoxBehavior(InputGroupCount.Text);
-                InputGroupLayersCount.setIntTextBoxBehavior(InputGroupLayersCount.Text);
-                generateSubmenuLayersControl(MenuItemAdd, mMaxLayersQuantityInSubMenu);
+                InputCategoryName.SetStringTextBoxBehavior(InputCategoryName.Text, CreateCategory);
+                InputGroupName.SetStringTextBoxBehavior(InputGroupName.Text, CreateGroupCategories);
+                InputLayerCount.SetIntTextBoxBehavior(InputLayerCount.Text);
+                InputGroupCount.SetIntTextBoxBehavior(InputGroupCount.Text);
+                InputGroupLayersCount.SetIntTextBoxBehavior(InputGroupLayersCount.Text);
+                GenerateSubmenuLayersControl(MenuItemAdd, MaxLayersQuantityInSubMenu);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -284,7 +275,7 @@ namespace WpfApp3
         //=====================================================================
         //Методы для кэлбэков
         //=====================================================================
-        private void progressBarIncrease(Boolean val)
+        private void ProgressBarIncrease(bool val)
         {
             try
             {
@@ -294,7 +285,7 @@ namespace WpfApp3
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void progressBarReset(Boolean val)
+        private void ProgressBarReset(bool val)
         {
             try
             {
@@ -310,10 +301,13 @@ namespace WpfApp3
                 Dispatcher.Invoke(() => { MessageBox.Show(ex.Message); ProgressBarCategory.Value = 0; });
             }
             catch (ThreadAbortException) { }
-            catch (Exception) { }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
 
-        private void buttonAccess(Boolean val)
+        private void ButtonAccess(bool val)
         {
             try
             {
@@ -339,17 +333,17 @@ namespace WpfApp3
         {
             try
             {
-                Dispatcher.Invoke(() => { updateSingleCategoryInList(name); });
+                Dispatcher.Invoke(() => { UpdateSingleCategoryInList(name); });
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private void ItemAddUpdate(List<Category> Croup)
+        private void ItemAddUpdate(List<Category> croup)
         {
             try
             {
-                Dispatcher.Invoke(() => { addGroupCategoriesToList(Croup); });
+                Dispatcher.Invoke(() => { AddGroupCategoriesToList(croup); });
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -367,8 +361,8 @@ namespace WpfApp3
                 int requestLayersCount = Convert.ToInt32(InputGroupLayersCount.Text);
                 ProgressBarCategory.Maximum = requestLayersCount;
                 CategoryConfigurator config = new CategoryConfigurator();
-                List<Category> CategoryGroup = config.getCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
-                mThreadCategoryCreator.createListCategories(CategoryGroup);
+                List<Category> categoryGroup = config.GetCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
+                mThreadCategoryCreator.CreateListCategories(categoryGroup);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -377,21 +371,25 @@ namespace WpfApp3
         //=====================================================================
         //Удалить все категории в списке
         //=====================================================================
-        public void deleteAllCategories(object sender, RoutedEventArgs e)
+        public void DeleteAllCategories(object sender, RoutedEventArgs e)
         {
             try
             {
                 var selectedItems = ListViewCategories.SelectedItems;
-                int x = selectedItems.Count;
-                for (int i = 0; i < x; ++i)
+                var x = selectedItems.Count;
+                for (var i = 0; i < x; ++i)
                 {
                     var item = ListViewCategories.SelectedItem;
                     var category = item as Category;
-                    var NXcategory = mWorkPart.LayerCategories.FindObject(category.Name);
-                    mSession.UpdateManager.AddToDeleteList(NXcategory);
-                    mDisplayCategoryList.Remove(category);
+                    if (category != null)
+                    {
+                        var nxCategory= mWorkPart.LayerCategories.FindObject(category.Name);
+                        mSession.UpdateManager.AddToDeleteList(nxCategory);
+                    }
+
+                    DisplayCategoryList.Remove(category);
                 }
-                updateNxScreen();
+                UpdateNxScreen();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -409,18 +407,18 @@ namespace WpfApp3
                 {
                     MenuItemDel.Items.Clear();
                     var selItems = ListViewCategories.SelectedItems;
-                    int selectedItemsCount = ListViewCategories.SelectedItems.Count;
-                    List<int> categoryQuantity = new List<int>();
-                    for (int i = 0; i < selectedItemsCount; i++)
+                    var selectedItemsCount = ListViewCategories.SelectedItems.Count;
+                    var categoryQuantity = new List<int>();
+                    for (var i = 0; i < selectedItemsCount; i++)
                     {
                         var item = selItems[i];
-                        var layCount = (item as Category).LayCount;
+                        var layCount = ((Category) item).LayCount;
                         categoryQuantity.Add(layCount);
                     }
-                    var maxVal = 15;
+                    const int maxVal = 15;
                     var totalCount = maxVal;
                     if (categoryQuantity.Min() < maxVal) totalCount = categoryQuantity.Min();
-                    generateSubmenuLayersControl(MenuItemDel, totalCount);
+                    GenerateSubmenuLayersControl(MenuItemDel, totalCount);
                 }
             }
             catch (ThreadAbortException) { }
@@ -430,16 +428,17 @@ namespace WpfApp3
         //=====================================================================
         //Генерация элементов субменю для добавления и удаления слоев из категории
         //=====================================================================
-        private void generateSubmenuLayersControl(MenuItem menuItem, int subItemsQuantity)
+        private void GenerateSubmenuLayersControl(MenuItem menuItem, int subItemsQuantity)
         {
+            if (menuItem == null) throw new ArgumentNullException(nameof(menuItem));
             try
             {
-                Uri plus_icon = new Uri("Resources/plus_icon.ico", UriKind.Relative);
-                Uri minus_icon = new Uri("Resources/minus_icon.ico", UriKind.Relative);
-                Uri currentUri = (menuItem == MenuItemDel) ? minus_icon : plus_icon;
+                var plusIcon = new Uri("Resources/plus_icon.ico", UriKind.Relative);
+                var minusIcon = new Uri("Resources/minus_icon.ico", UriKind.Relative);
+                var currentUri = (menuItem == MenuItemDel) ? minusIcon : plusIcon;
 
-                List<MenuItem> listSubMenuItems = new List<MenuItem>();
-                for (int i = 0; i < subItemsQuantity; i++)
+                var listSubMenuItems = new List<MenuItem>();
+                for (var i = 0; i < subItemsQuantity; i++)
                 {
                     listSubMenuItems.Add(new MenuItem());
                     listSubMenuItems[i].Header = (i + 1).ToString();
@@ -451,9 +450,11 @@ namespace WpfApp3
                     };
                     listSubMenuItems[i].Click += (se, sa) =>
                     {
-                        var subitem = se as MenuItem;
-                        if (menuItem == MenuItemDel) deleteLayersFromCategory(Convert.ToInt32(subitem.Header));
-                        if (menuItem == MenuItemAdd) addLayersToCategory(Convert.ToInt32(subitem.Header));
+                        var subItem = se as MenuItem;
+                        if (menuItem == MenuItemDel)
+                            if (subItem != null)
+                                DeleteLayersFromCategory(Convert.ToInt32(subItem.Header));
+                        if (menuItem == MenuItemAdd) AddLayersToCategory(Convert.ToInt32(subItem?.Header));
                     };
                     listSubMenuItems[i].IsCheckable = false;
                     menuItem.Items.Add(listSubMenuItems[i]);
@@ -466,26 +467,26 @@ namespace WpfApp3
         //=====================================================================
         //Удаляет заданное число слоев из категории
         //=====================================================================
-        private void deleteLayersFromCategory(int quantityLayersToDelete)
+        private void DeleteLayersFromCategory(int quantityLayersToDelete)
         {
             try
             {
-                List<string> names = getCategoriesNamesFromListView();
+                var names = GetCategoriesNamesFromListView();
                 names.ForEach(x =>
                 {
                     var nxCategory = mWorkPart.LayerCategories.FindObject(x);
                     var layers = nxCategory.GetMemberLayers();
-                    int count = layers.Length - quantityLayersToDelete;
+                    var count = layers.Length - quantityLayersToDelete;
                     if (count < 0) throw new Exception("количество слоев меньше 0");
-                    int[] newLayers = new int[layers.Length - quantityLayersToDelete];
-                    for (int i = 0; i < count; ++i)
+                    var newLayers = new int[layers.Length - quantityLayersToDelete];
+                    for (var i = 0; i < count; ++i)
                     {
                         newLayers[i] = layers[i];
                     }
                     nxCategory.SetMemberLayers(newLayers);
                 });
-                updateItemList();
-                updateNxScreen();
+                UpdateItemList();
+                UpdateNxScreen();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -494,25 +495,20 @@ namespace WpfApp3
         //=====================================================================
         //Возврат имен категорий со списка
         //=====================================================================
-        private List<string> getCategoriesNamesFromListView()
+        private List<string> GetCategoriesNamesFromListView()
         {
-            List<string> names = new List<string>();
             var categories = ListViewCategories.SelectedItems;
-            for (int i = 0; i < categories.Count; ++i)
-            {
-                names.Add((categories[i] as Category).Name);
-            }
-            return names;
+            return (from object t in categories select (t as Category)?.Name).ToList();
         }
 
-        private void addLayersToCategory(int addLayersQuantity)
+        private void AddLayersToCategory(int addLayersQuantity)
         {
             try
             {
                 if (addLayersQuantity == 0) throw new Exception("addLayersToCategory() have zero argument");
-                List<string> names = getCategoriesNamesFromListView();
+                List<string> names = GetCategoriesNamesFromListView();
                 if (names.Count == 0) throw new Exception("addLayersToCategory() have zero name group");
-                mThreadCategoryCreator.addLayersToExistCategory(names, addLayersQuantity);
+                mThreadCategoryCreator.AddLayersToExistCategory(names, addLayersQuantity);
                 ProgressBarCategory.Maximum = names.Count * addLayersQuantity;
             }
             catch (ThreadAbortException) { }
@@ -533,8 +529,7 @@ namespace WpfApp3
         {
             try
             {
-                var item = ListViewCategories.SelectedItem as Category;
-                Clipboard.SetText(item.Name);
+                if (ListViewCategories.SelectedItem is Category item) Clipboard.SetText(item.Name);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -544,7 +539,7 @@ namespace WpfApp3
         {
             try
             {
-                List<Category> items = getSelectedCategories();
+                List<Category> items = GetSelectedCategories();
                 mThreadCategoryCreator.ClearLayers(items, 0);
             }
             catch (ThreadAbortException) { }
@@ -555,23 +550,20 @@ namespace WpfApp3
         {
             try
             {
-                List<Category> items = getSelectedCategories();
+                List<Category> items = GetSelectedCategories();
                 mThreadCategoryCreator.ClearLayers(items, 1);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
 
-        private List<Category> getSelectedCategories()
+        private List<Category> GetSelectedCategories()
         {
-            List<Category> items = new List<Category>();
+            var items = new List<Category>();
             try
             {
                 var temp = ListViewCategories.SelectedItems;
-                foreach (var x in temp)
-                {
-                    items.Add(x as Category);
-                }
+                items.AddRange(from object x in temp select x as Category);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -582,12 +574,12 @@ namespace WpfApp3
         {
             try
             {
-                List<Category> selItems = getSelectedCategories();
+                var selItems = GetSelectedCategories();
                 selItems.ForEach(x =>
                 {
                     var category = mWorkPart.LayerCategories.FindObject(x.Name);
                     category.SetMemberLayers(new int[0]);
-                    updateSingleCategoryInList(x.Name);
+                    UpdateSingleCategoryInList(x.Name);
                 });
             }
             catch (ThreadAbortException) { }

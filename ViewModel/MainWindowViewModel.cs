@@ -1,20 +1,14 @@
-﻿using Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WpfApp3;
+﻿using System.Collections.ObjectModel;
+using Prism.Mvvm;
 
-namespace WpfApp3.ViewModel
+namespace NXLM.ViewModel
 {
-    class MainWindowViewModel : BindableBase
+    internal class MainWindowViewModel : BindableBase
     {
         public ObservableCollection<Category> CategoryList { get; set; }
-        public MainWindowViewModel(ObservableCollection<Category> List)
+        public MainWindowViewModel(ObservableCollection<Category> list)
         {
-            CategoryList = List;
+            CategoryList = list;
         }
     }
 }
