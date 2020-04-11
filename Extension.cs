@@ -15,11 +15,11 @@ namespace NXLM
         в зависимости от содержимого поля ввода*/
         public static void SetStringTextBoxBehavior(this TextBox textBox, string defaultMessage, Button relativeButton)
         {
-            string message = defaultMessage; //Текст приглашения ввода текста в TwxtBox
-            string nullString = ""; //Пустой текст
-            int zero = 0; //Ну тут очевидно
-            SolidColorBrush colorBlack = Brushes.Black; //Цвет активного текста
-            SolidColorBrush colorLightGray = Brushes.LightGray; // Цвет неактивного текста
+            var message = defaultMessage; //Текст приглашения ввода текста в TwxtBox
+            const string nullString = ""; //Пустой текст
+            const int zero = 0; //Ну тут очевидно
+            var colorBlack = Brushes.Black; //Цвет активного текста
+            var colorLightGray = Brushes.LightGray; // Цвет неактивного текста
 
             textBox.TextChanged += (se, ea) =>
             {
@@ -44,23 +44,21 @@ namespace NXLM
 
             textBox.MouseLeave += (se, ea) =>
             {
-                if (textBox.Text.Length == zero && !textBox.IsSelectionActive) 
-                {
-                        textBox.Text = message;
-                        textBox.Foreground = colorLightGray;
-                        relativeButton.IsEnabled = false;
-                } 
+                if (textBox.Text.Length != zero || textBox.IsSelectionActive) return;
+                textBox.Text = message;
+                textBox.Foreground = colorLightGray;
+                relativeButton.IsEnabled = false;
             };
         }
 
         public static void SetIntTextBoxBehavior(this TextBox textBox, string defaulValue)
         {
-            int textBoxLenght = 3; //Максимальная длина поля ввода
+            var textBoxLenght = 3; //Максимальная длина поля ввода
             textBox.MaxLength = textBoxLenght;
-            string defValue = defaulValue;
+            var defValue = defaulValue;
             textBox.KeyDown += (se, ea) =>
             {
-                List<Key> allowedKeys = new List<Key>() { Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, 
+                var allowedKeys = new List<Key>() { Key.D0, Key.D1, Key.D2, Key.D3, Key.D4, Key.D5, 
                     Key.D6, Key.D7, Key.D8, Key.D9, Key.NumPad0, Key.NumPad1, Key.NumPad2, Key.NumPad3,Key.NumPad4, 
                     Key.NumPad5, Key.NumPad6, Key.NumPad7, Key.NumPad8, Key.NumPad9};
                 if (!allowedKeys.Contains(ea.Key)) ea.Handled = true;
@@ -70,11 +68,9 @@ namespace NXLM
 
             textBox.MouseLeave += (se, sa) => 
             {
-                if (textBox.Text.Length == 0 || textBox.Text == "0") 
-                { 
-                    textBox.Text = defValue;
-                    textBox.Select(textBox.Text.Length, 0);
-                }
+                if (textBox.Text.Length != 0 && textBox.Text != "0") return;
+                textBox.Text = defValue;
+                textBox.Select(textBox.Text.Length, 0);
             };
         }
     }

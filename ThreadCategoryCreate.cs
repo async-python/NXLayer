@@ -28,7 +28,7 @@ namespace NXLM
         private readonly UpdateDisplayCategories updateCategoriesCallback; //Обновление в приложении списка категорий
         private readonly UpdateLayersQuantity updateLayesQuantityCalback; //Обновить число слоев в категории
 
-        private const string NxMainGategory = Singleton.NxMainCategory;
+        private const string NxMainCategory = Singleton.NxMainCategory;
         private const int WorkLayer = Singleton.WorkLayer;
         private const int MaxLayersCount = Singleton.MaxLayersCount;
         private Thread currentThread;
@@ -68,7 +68,7 @@ namespace NXLM
                         controlStateCallback(false);
                         if (@group.Count == 0) throw new Exception("Количество категорий меньше 1");
                         var currentCategoryList = mWorkPart.LayerCategories.ToArray().ToList();
-                        int requestLayersCount = 0;
+                        var requestLayersCount = 0;
                         @group.ForEach(x =>
                         {
                             currentCategoryList.ForEach(element =>
@@ -111,10 +111,10 @@ namespace NXLM
             try
             {
                 var currentCategoryList = mWorkPart.LayerCategories.ToArray().ToList();
-                currentCategoryList = currentCategoryList.Where(x => x.Name != NxMainGategory).ToList();
+                currentCategoryList = currentCategoryList.Where(x => x.Name != NxMainCategory).ToList();
                 var layers = new List<int>();
                 currentCategoryList.ForEach(x => { layers.AddRange(x.GetMemberLayers().ToList()); });
-                var allLayers = mWorkPart.LayerCategories.FindObject(NxMainGategory).GetMemberLayers().ToList();
+                var allLayers = mWorkPart.LayerCategories.FindObject(NxMainCategory).GetMemberLayers().ToList();
                 var resultArray = allLayers.Distinct().Except(layers).ToList();
                 resultArray.Remove(WorkLayer);
                 //if (reultArray.Count < requestLayersCount) throw new Exception("Недостаточно свободных слоев");
@@ -183,14 +183,16 @@ namespace NXLM
         //Разделение массива на несколько частей согласно количеству 
         //выделенных категорий
         //=====================================================================
-        private List<int[]> GetApartedArray(int[] apartArray, int partsQuantity)
+        private List<int[]> GetApartedArray(IReadOnlyList<int> apartArray, int partsQuantity)
         {
+            if (apartArray == null) throw new ArgumentNullException(nameof(apartArray));
+            if (partsQuantity <= 0) throw new ArgumentOutOfRangeException(nameof(partsQuantity));
             var aparted = new List<int[]>();
             try
             {
                 //if (partsQuantity < 1) Thread.CurrentThread.Abort();
                 if (partsQuantity < 1) throw new Exception("функция getApartArray() аргумент меньше 0");
-                var layersInPart = apartArray.Length / partsQuantity;
+                var layersInPart = apartArray.Count / partsQuantity;
                 var k = 0;
                 for (var i = 0; i < partsQuantity; ++i)
                 {

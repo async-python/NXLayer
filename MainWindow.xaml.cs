@@ -356,12 +356,12 @@ namespace NXLM
         {
             try
             {
-                string requestGroupName = InputGroupName.Text;
-                int requestGroupCount = Convert.ToInt32(InputGroupCount.Text);
-                int requestLayersCount = Convert.ToInt32(InputGroupLayersCount.Text);
+                var requestGroupName = InputGroupName.Text;
+                var requestGroupCount = Convert.ToInt32(InputGroupCount.Text);
+                var requestLayersCount = Convert.ToInt32(InputGroupLayersCount.Text);
                 ProgressBarCategory.Maximum = requestLayersCount;
-                CategoryConfigurator config = new CategoryConfigurator();
-                List<Category> categoryGroup = config.GetCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
+                var config = new CategoryConfigurator();
+                var categoryGroup = config.GetCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
                 mThreadCategoryCreator.CreateListCategories(categoryGroup);
             }
             catch (ThreadAbortException) { }
@@ -506,7 +506,7 @@ namespace NXLM
             try
             {
                 if (addLayersQuantity == 0) throw new Exception("addLayersToCategory() have zero argument");
-                List<string> names = GetCategoriesNamesFromListView();
+                var names = GetCategoriesNamesFromListView();
                 if (names.Count == 0) throw new Exception("addLayersToCategory() have zero name group");
                 mThreadCategoryCreator.AddLayersToExistCategory(names, addLayersQuantity);
                 ProgressBarCategory.Maximum = names.Count * addLayersQuantity;
@@ -539,7 +539,7 @@ namespace NXLM
         {
             try
             {
-                List<Category> items = GetSelectedCategories();
+                var items = GetSelectedCategories();
                 mThreadCategoryCreator.ClearLayers(items, 0);
             }
             catch (ThreadAbortException) { }
@@ -550,7 +550,7 @@ namespace NXLM
         {
             try
             {
-                List<Category> items = GetSelectedCategories();
+                var items = GetSelectedCategories();
                 mThreadCategoryCreator.ClearLayers(items, 1);
             }
             catch (ThreadAbortException) { }

@@ -58,30 +58,29 @@
     <Reference Include="CommonServiceLocator, Version=2.0.4.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>packages\CommonServiceLocator.2.0.4\lib\net47\CommonServiceLocator.dll</HintPath>
     </Reference>
-    <Reference Include="NXOpen, Version=10.0.3.5, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NXOpen, Version=1880.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Siemens\NX1872\NXBIN\managed\NXOpen.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Siemens\NX 10.0\UGII\managed\NXOpen.dll</HintPath>
     </Reference>
-    <Reference Include="NXOpen.Guide">
-      <HintPath>..\..\..\..\..\Program Files\Siemens\NX1872\NXBIN\managed\NXOpen.Guide.dll</HintPath>
-    </Reference>
-    <Reference Include="NXOpen.UF, Version=10.0.2.5, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NXOpen.UF, Version=1872.1500.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Siemens\NX1872\NXBIN\managed\NXOpen.UF.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Siemens\NX 10.0\UGII\managed\NXOpen.UF.dll</HintPath>
     </Reference>
-    <Reference Include="NXOpen.Utilities, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NXOpen.Utilities, Version=1880.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Siemens\NX1872\NXBIN\managed\NXOpen.Utilities.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Siemens\NX 10.0\UGII\managed\NXOpen.Utilities.dll</HintPath>
     </Reference>
-    <Reference Include="NXOpenUI, Version=10.0.3.5, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="NXOpenUI, Version=1880.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files\Siemens\NX1872\NXBIN\managed\NXOpenUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Siemens\NX 10.0\UGII\managed\NXOpenUI.dll</HintPath>
     </Reference>
     <Reference Include="Prism, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>packages\Prism.Core.7.2.0.1422\lib\net45\Prism.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Prism.Wpf, Version=7.2.0.1422, Culture=neutral, PublicKeyToken=40ee6c3a2184dc59, processorArchitecture=MSIL">
       <HintPath>packages\Prism.Wpf.7.2.0.1422\lib\net45\Prism.Wpf.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
