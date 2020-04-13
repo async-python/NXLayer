@@ -15,35 +15,35 @@ namespace NXLM
     //=====================================================================
     public class Category : BindableBase
     {
-        private string name;
-        private int layerCount;
+        private string _name;
+        private int _layerCount;
 
         public Category() { }
         public Category(string name, int layCount)
         {
-            this.name = name;
-            this.layerCount = layCount;
+            this._name = name;
+            this._layerCount = layCount;
         }
 
         public string Name 
         {
             set 
             { 
-                name = value;
-                RaisePropertyChanged(nameof(name));
+                _name = value;
+                RaisePropertyChanged(nameof(_name));
             }
 
-            get => name;
+            get => _name;
         }
 
         public int LayCount 
         {
             set 
             { 
-                layerCount = value;
+                _layerCount = value;
                 RaisePropertyChanged(nameof(LayCount));
             }
-            get => layerCount;
+            get => _layerCount;
         }
     }
     //=====================================================================
@@ -66,14 +66,14 @@ namespace NXLM
     //=====================================================================
     public class CategoryConfigurator
     {
-        private readonly List<GroupTemplate> mCategoriesTemplate = new List<GroupTemplate>();
+        private readonly List<GroupTemplate> _mCategoriesTemplate = new List<GroupTemplate>();
 
         public CategoryConfigurator()
         {
-            mCategoriesTemplate.Add(new GroupTemplate("01_TEH", 1, 1));
-            mCategoriesTemplate.Add(new GroupTemplate("03_ZAG", 5, 1));
-            mCategoriesTemplate.Add(new GroupTemplate("04_OSN", 5, 1));
-            mCategoriesTemplate.Add(new GroupTemplate("06_OBR", 5, 12));
+            _mCategoriesTemplate.Add(new GroupTemplate("01_TEH", 1, 1));
+            _mCategoriesTemplate.Add(new GroupTemplate("03_ZAG", 5, 1));
+            _mCategoriesTemplate.Add(new GroupTemplate("04_OSN", 5, 1));
+            _mCategoriesTemplate.Add(new GroupTemplate("06_OBR", 5, 12));
         }
 
         public List<Category> GetCategoryGroup(string groupCategoriesName, int categoriesCount, int layerCountInCategory) //возвращает сконфигурированную группу категорий
@@ -94,12 +94,12 @@ namespace NXLM
         public List<Category> GetGroupTemplate() //возвращает сконфигурированный шаблон с группами категорий согласно перечню CategoriesTemplate
         {
             var groupTemplate = new List<Category>();
-            for (var i = 0; i < mCategoriesTemplate.Count(); ++i)
+            for (var i = 0; i < _mCategoriesTemplate.Count(); ++i)
             {
                 var temp = GetCategoryGroup(
-                    mCategoriesTemplate[i].Name, 
-                    mCategoriesTemplate[i].Count, 
-                    mCategoriesTemplate[i].LayCount);
+                    _mCategoriesTemplate[i].Name, 
+                    _mCategoriesTemplate[i].Count, 
+                    _mCategoriesTemplate[i].LayCount);
                 groupTemplate.AddRange(temp);
             }
             return groupTemplate;

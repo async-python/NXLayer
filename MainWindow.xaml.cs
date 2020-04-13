@@ -13,14 +13,12 @@ using NXOpen;
 
 namespace NXLM
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
-        private readonly ThreadCategoryCreate mThreadCategoryCreator;
-        private readonly Session mSession;
-        private readonly Part mWorkPart;
-        private BasePart mBasePart;
-        private Part mDisplayPart;
-        private NXOpen.Layer.Category[] mNxCategories;
+        private readonly ThreadCategoryCreate _mThreadCategoryCreator;
+        private readonly Session _mSession;
+        private readonly Part _mWorkPart;
+        private NXOpen.Layer.Category[] _mNxCategories;
         private const int WorkLayer = Singleton.WorkLayer; //Неиспользуемый рабочий слой
         private const int MaxLayersCount = Singleton.MaxLayersCount; //Общее число слоев
         private const string NxMainCategory = Singleton.NxMainCategory; //Базовая категория NX, которой принадлежат все слои
@@ -37,13 +35,12 @@ namespace NXLM
         {
             try
             {
+                Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
                 InitializeComponent();
-                mSession = Session.GetSession();
+                _mSession = Session.GetSession();
                 Singleton.GetInstance();
-                mWorkPart = mSession.Parts.Work;
-                mBasePart = mSession.Parts.BaseWork;
-                mDisplayPart = mSession.Parts.Display;
-                mThreadCategoryCreator = new ThreadCategoryCreate(
+                _mWorkPart = _mSession.Parts.Work;
+                _mThreadCategoryCreator = new ThreadCategoryCreate(
                     ProgressBarIncrease, ProgressBarReset,
                     ExceptionThread, ButtonAccess,
                     ItemUpdate, ItemAddUpdate);
@@ -61,7 +58,7 @@ namespace NXLM
         {
             try
             {
-                var category = mWorkPart.LayerCategories.FindObject(name);
+                var category = _mWorkPart.LayerCategories.FindObject(name);
                 foreach (var x in DisplayCategoryList)
                 {
                     if (x.Name == name) { x.LayCount = category.GetMemberLayers().Length; }
@@ -96,8 +93,8 @@ namespace NXLM
             try
             {
                 DisplayCategoryList.Clear();
-                mNxCategories = mWorkPart.LayerCategories.ToArray();
-                var tempArray = mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == NxMainCategory).ToList();
+                _mNxCategories = _mWorkPart.LayerCategories.ToArray();
+                var tempArray = _mNxCategories.OrderBy(g => g.Name).SkipWhile(x => x.Name == NxMainCategory).ToList();
                 tempArray.ForEach(g =>
                 {
                     if (g.Name != NxMainCategory) DisplayCategoryList.Add(new Category(g.Name, g.GetMemberLayers().Count()));
@@ -121,8 +118,10 @@ namespace NXLM
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterScreen
                 };
-                Application app = new App();
-                app.ShutdownMode = ShutdownMode.OnLastWindowClose;
+                Application app = new App
+                {
+                    ShutdownMode = ShutdownMode.OnLastWindowClose
+                };
                 app.Run(myForm);
             }
             catch (ThreadAbortException) { }
@@ -158,10 +157,10 @@ namespace NXLM
         {
             try
             {
-                mNxCategories = mWorkPart.LayerCategories.ToArray();
-                foreach (var x in mNxCategories)
+                _mNxCategories = _mWorkPart.LayerCategories.ToArray();
+                foreach (var x in _mNxCategories)
                 {
-                    mSession.UpdateManager.AddToDeleteList(x);
+                    _mSession.UpdateManager.AddToDeleteList(x);
                     UpdateNxScreen();
                     UpdateItemList();
                 }
@@ -177,9 +176,9 @@ namespace NXLM
         {
             try
             {
-                var id = mSession.NewestVisibleUndoMark;
-                mSession.UpdateManager.DoUpdate(id);
-                mSession.DeleteUndoMark(id, null);
+                var id = _mSession.NewestVisibleUndoMark;
+                _mSession.UpdateManager.DoUpdate(id);
+                _mSession.DeleteUndoMark(id, null);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -205,7 +204,7 @@ namespace NXLM
                         arr[i] = layerNumber;
                         ++layerNumber;
                     }
-                    mWorkPart.LayerCategories.CreateCategory(x.Name, "", arr);
+                    _mWorkPart.LayerCategories.CreateCategory(x.Name, "", arr);
                 }
                 UpdateNxScreen();
                 UpdateItemList();
@@ -244,7 +243,7 @@ namespace NXLM
                 ProgressBarCategory.Maximum = requestLayersCount;
 
                 var categoryGroup = new List<Category>() { new Category(requestCategoryName, requestLayersCount) };
-                mThreadCategoryCreator.CreateListCategories(categoryGroup);
+                _mThreadCategoryCreator.CreateListCategories(categoryGroup);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -362,7 +361,7 @@ namespace NXLM
                 ProgressBarCategory.Maximum = requestLayersCount;
                 var config = new CategoryConfigurator();
                 var categoryGroup = config.GetCategoryGroup(requestGroupName, requestGroupCount, requestLayersCount);
-                mThreadCategoryCreator.CreateListCategories(categoryGroup);
+                _mThreadCategoryCreator.CreateListCategories(categoryGroup);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -383,8 +382,8 @@ namespace NXLM
                     var category = item as Category;
                     if (category != null)
                     {
-                        var nxCategory= mWorkPart.LayerCategories.FindObject(category.Name);
-                        mSession.UpdateManager.AddToDeleteList(nxCategory);
+                        var nxCategory= _mWorkPart.LayerCategories.FindObject(category.Name);
+                        _mSession.UpdateManager.AddToDeleteList(nxCategory);
                     }
 
                     DisplayCategoryList.Remove(category);
@@ -474,7 +473,7 @@ namespace NXLM
                 var names = GetCategoriesNamesFromListView();
                 names.ForEach(x =>
                 {
-                    var nxCategory = mWorkPart.LayerCategories.FindObject(x);
+                    var nxCategory = _mWorkPart.LayerCategories.FindObject(x);
                     var layers = nxCategory.GetMemberLayers();
                     var count = layers.Length - quantityLayersToDelete;
                     if (count < 0) throw new Exception("количество слоев меньше 0");
@@ -508,7 +507,7 @@ namespace NXLM
                 if (addLayersQuantity == 0) throw new Exception("addLayersToCategory() have zero argument");
                 var names = GetCategoriesNamesFromListView();
                 if (names.Count == 0) throw new Exception("addLayersToCategory() have zero name group");
-                mThreadCategoryCreator.AddLayersToExistCategory(names, addLayersQuantity);
+                _mThreadCategoryCreator.AddLayersToExistCategory(names, addLayersQuantity);
                 ProgressBarCategory.Maximum = names.Count * addLayersQuantity;
             }
             catch (ThreadAbortException) { }
@@ -540,7 +539,7 @@ namespace NXLM
             try
             {
                 var items = GetSelectedCategories();
-                mThreadCategoryCreator.ClearLayers(items, 0);
+                _mThreadCategoryCreator.ClearLayers(items, 0);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -551,7 +550,7 @@ namespace NXLM
             try
             {
                 var items = GetSelectedCategories();
-                mThreadCategoryCreator.ClearLayers(items, 1);
+                _mThreadCategoryCreator.ClearLayers(items, 1);
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
@@ -577,7 +576,7 @@ namespace NXLM
                 var selItems = GetSelectedCategories();
                 selItems.ForEach(x =>
                 {
-                    var category = mWorkPart.LayerCategories.FindObject(x.Name);
+                    var category = _mWorkPart.LayerCategories.FindObject(x.Name);
                     category.SetMemberLayers(new int[0]);
                     UpdateSingleCategoryInList(x.Name);
                 });

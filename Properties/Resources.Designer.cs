@@ -22,7 +22,7 @@ namespace NXLM.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace NXLM.Properties {
         ///   Возвращает кэшированный экземпляр ResourceManager, использованный этим классом.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("NXLM.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace NXLM.Properties {
         ///   обращений к ресурсу с помощью этого класса ресурса со строгой типизацией.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon add_lay {
+        public static System.Drawing.Icon add_lay {
             get {
                 object obj = ResourceManager.GetObject("add_lay", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -73,7 +73,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon copy_icon {
+        public static System.Drawing.Icon copy_icon {
             get {
                 object obj = ResourceManager.GetObject("copy_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -83,7 +83,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cut_icon {
+        public static System.Drawing.Bitmap cut_icon {
             get {
                 object obj = ResourceManager.GetObject("cut_icon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -93,7 +93,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon cut_icon1 {
+        public static System.Drawing.Icon cut_icon1 {
             get {
                 object obj = ResourceManager.GetObject("cut_icon1", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -103,7 +103,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon del_nobjects {
+        public static System.Drawing.Icon del_nobjects {
             get {
                 object obj = ResourceManager.GetObject("del_nobjects", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -113,7 +113,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon del_remov {
+        public static System.Drawing.Icon del_remov {
             get {
                 object obj = ResourceManager.GetObject("del_remov", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -123,7 +123,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon delete_icon {
+        public static System.Drawing.Icon delete_icon {
             get {
                 object obj = ResourceManager.GetObject("delete_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -133,7 +133,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon minus_icon {
+        public static System.Drawing.Icon minus_icon {
             get {
                 object obj = ResourceManager.GetObject("minus_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -143,7 +143,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon plus_icon {
+        public static System.Drawing.Icon plus_icon {
             get {
                 object obj = ResourceManager.GetObject("plus_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -153,7 +153,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon rad_icon {
+        public static System.Drawing.Icon rad_icon {
             get {
                 object obj = ResourceManager.GetObject("rad_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -163,7 +163,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon rec_empty {
+        public static System.Drawing.Icon rec_empty {
             get {
                 object obj = ResourceManager.GetObject("rec_empty", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -173,7 +173,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon rec_full {
+        public static System.Drawing.Icon rec_full {
             get {
                 object obj = ResourceManager.GetObject("rec_full", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
@@ -183,7 +183,7 @@ namespace NXLM.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
         /// </summary>
-        internal static System.Drawing.Icon vir_icon {
+        public static System.Drawing.Icon vir_icon {
             get {
                 object obj = ResourceManager.GetObject("vir_icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));

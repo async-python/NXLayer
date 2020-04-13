@@ -17,39 +17,39 @@ namespace NXLM
      */
     public class ThreadCategoryCreate
     {
-        private readonly Part mWorkPart;
+        private readonly Part _mWorkPart;
         private static readonly object Locker = new object(); //обеспечивает последовательность обращений потоков к API
 
         //Кэлбэки для общения с основным потоком
-        private readonly ProgressBarIncreaseCallback mProgrBarIncreaseCallback; //Увеличение значения прогресбара на 1
-        private readonly ProgressBarResetCallback prBarResetCallback; //Обнуление прогрессбара
-        private readonly ExceptionCallback exceptionCallback; //Вывод сообщения ошибки в основной поток
-        private readonly ButtonControlsAccess controlStateCallback; //Активация и деактивация кнопок управления
-        private readonly UpdateDisplayCategories updateCategoriesCallback; //Обновление в приложении списка категорий
-        private readonly UpdateLayersQuantity updateLayesQuantityCalback; //Обновить число слоев в категории
+        private readonly ProgressBarIncreaseCallback _mProgressBarIncreaseCallback; //Увеличение значения прогресбара на 1
+        private readonly ProgressBarResetCallback _prBarResetCallback; //Обнуление прогрессбара
+        private readonly ExceptionCallback _exceptionCallback; //Вывод сообщения ошибки в основной поток
+        private readonly ButtonControlsAccess _controlStateCallback; //Активация и деактивация кнопок управления
+        private readonly UpdateDisplayCategories _updateCategoriesCallback; //Обновление в приложении списка категорий
+        private readonly UpdateLayersQuantity _updateLayersQuantityCallback; //Обновить число слоев в категории
 
         private const string NxMainCategory = Singleton.NxMainCategory;
         private const int WorkLayer = Singleton.WorkLayer;
         private const int MaxLayersCount = Singleton.MaxLayersCount;
-        private Thread currentThread;
+        private Thread _currentThread;
 
         public ThreadCategoryCreate(
-            ProgressBarIncreaseCallback cback,
-            ProgressBarResetCallback rback,
-            ExceptionCallback eback,
-            ButtonControlsAccess bback,
-            UpdateDisplayCategories updback,
-            UpdateLayersQuantity addback)
+            ProgressBarIncreaseCallback progressBarIncreaseCallback,
+            ProgressBarResetCallback progressBarResetCallback,
+            ExceptionCallback exceptionCallback,
+            ButtonControlsAccess buttonControlsAccess,
+            UpdateDisplayCategories updateDisplayCategories,
+            UpdateLayersQuantity updateLayersQuantity)
         {
             var session = Session.GetSession();
-            mWorkPart = session.Parts.Work;
+            _mWorkPart = session.Parts.Work;
 
-            mProgrBarIncreaseCallback = cback;
-            prBarResetCallback = rback;
-            exceptionCallback = eback;
-            controlStateCallback = bback;
-            updateCategoriesCallback = updback;
-            updateLayesQuantityCalback = addback;
+            _mProgressBarIncreaseCallback = progressBarIncreaseCallback;
+            _prBarResetCallback = progressBarResetCallback;
+            this._exceptionCallback = exceptionCallback;
+            _controlStateCallback = buttonControlsAccess;
+            _updateCategoriesCallback = updateDisplayCategories;
+            _updateLayersQuantityCallback = updateLayersQuantity;
         }
 
         //=====================================================================
@@ -65,38 +65,41 @@ namespace NXLM
                 {
                     try
                     {
-                        controlStateCallback(false);
+                        _controlStateCallback(false);
                         if (@group.Count == 0) throw new Exception("Количество категорий меньше 1");
-                        var currentCategoryList = mWorkPart.LayerCategories.ToArray().ToList();
+                        var currentCategoryList = _mWorkPart.LayerCategories.ToArray().ToList();
                         var requestLayersCount = 0;
                         @group.ForEach(x =>
                         {
                             currentCategoryList.ForEach(element =>
                             {
-                                if (element.Name == x.Name) throw new Exception("Имя категории уже существует");
+                                if (element.Name == x.Name) 
+                                    throw new Exception("Имя категории уже существует");
                             });
                             requestLayersCount += x.LayCount;
                         });
-                        if (requestLayersCount > MaxLayersCount - 1) throw new Exception("Недостаточно слоев");
+                        if (requestLayersCount > MaxLayersCount - 1) 
+                            throw new Exception("Недостаточно слоев");
                         var freeLayers = GetLayersWithoutObjects(requestLayersCount);
                         var apartedLayers = GetApartedArray(freeLayers, @group.Count);
-                        if (apartedLayers.Count != @group.Count) throw new Exception("ошибка сравнения массивов в функции createListCategories");
+                        if (apartedLayers.Count != @group.Count) 
+                            throw new Exception("ошибка сравнения массивов в функции createListCategories");
                         @group.ForEach(x =>
                         {
-                            mWorkPart.LayerCategories.CreateCategory(x.Name, "", apartedLayers[@group.IndexOf(x)]);
+                            _mWorkPart.LayerCategories.CreateCategory(x.Name, "", apartedLayers[@group.IndexOf(x)]);
                         });
-                        updateLayesQuantityCalback(@group);
-                        prBarResetCallback(true);
-                        controlStateCallback(true);
+                        _updateLayersQuantityCallback(@group);
+                        _prBarResetCallback(true);
+                        _controlStateCallback(true);
                     }
                     catch (ThreadAbortException) { }
                     catch (Exception ex) { ExceptionActions(ex); }
                 }
             });
-                currentThread = new Thread(new ThreadStart(ts));
-                currentThread.SetApartmentState(ApartmentState.STA);
-                currentThread.IsBackground = true;
-                currentThread.Start();
+                _currentThread = new Thread(ts);
+                _currentThread.SetApartmentState(ApartmentState.STA);
+                _currentThread.IsBackground = true;
+                _currentThread.Start();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { ExceptionActions(ex); }
@@ -110,23 +113,22 @@ namespace NXLM
             var freeLayers = new int[requestLayersCount];
             try
             {
-                var currentCategoryList = mWorkPart.LayerCategories.ToArray().ToList();
+                var currentCategoryList = _mWorkPart.LayerCategories.ToArray().ToList();
                 currentCategoryList = currentCategoryList.Where(x => x.Name != NxMainCategory).ToList();
                 var layers = new List<int>();
                 currentCategoryList.ForEach(x => { layers.AddRange(x.GetMemberLayers().ToList()); });
-                var allLayers = mWorkPart.LayerCategories.FindObject(NxMainCategory).GetMemberLayers().ToList();
+                var allLayers = _mWorkPart.LayerCategories.FindObject(NxMainCategory).GetMemberLayers().ToList();
                 var resultArray = allLayers.Distinct().Except(layers).ToList();
                 resultArray.Remove(WorkLayer);
-                //if (reultArray.Count < requestLayersCount) throw new Exception("Недостаточно свободных слоев");
                 var z = 0;
                 for (var i = 0; i < resultArray.Count(); ++i)
                 {
                     if (z == requestLayersCount) break;
                     if (resultArray[i] > MaxLayersCount) throw new Exception("Недостаточно свободных слоев без обьектов для создания категории");
-                    if (mWorkPart.Layers.GetAllObjectsOnLayer(resultArray[i]).Any()) continue;
+                    if (_mWorkPart.Layers.GetAllObjectsOnLayer(resultArray[i]).Any()) continue;
                     freeLayers[z] = resultArray[i];
                     ++z;
-                    mProgrBarIncreaseCallback(true);
+                    _mProgressBarIncreaseCallback(true);
                 }
             }
             catch (ThreadAbortException) { }
@@ -149,19 +151,19 @@ namespace NXLM
                     {
                         try
                         {
-                            controlStateCallback(false);
+                            _controlStateCallback(false);
                             var totalLayersRequest = layersQuantity * names.Count;
                             var freeLayers = GetLayersWithoutObjects(totalLayersRequest);
                             var freeLayersGroups = GetApartedArray(freeLayers, names.Count);
                             for (var i = 0; i < names.Count; ++i)
                             {
-                                var category = mWorkPart.LayerCategories.FindObject(names[i]);
+                                var category = _mWorkPart.LayerCategories.FindObject(names[i]);
                                 var currentLayers = category.GetMemberLayers().ToList().Concat(freeLayersGroups[i].ToList());
                                 category.SetMemberLayers(currentLayers.ToArray());
-                                updateCategoriesCallback(category.Name);
+                                _updateCategoriesCallback(category.Name);
                             }
-                            prBarResetCallback(true);
-                            controlStateCallback(true);
+                            _prBarResetCallback(true);
+                            _controlStateCallback(true);
                         }
                         catch (ThreadAbortException) { }
                         catch (Exception ex) { ExceptionActions(ex); }
@@ -170,10 +172,10 @@ namespace NXLM
                 catch (ThreadAbortException) { }
                 catch (Exception ex) { ExceptionActions(ex); }
             });
-                currentThread = new Thread(new ThreadStart(ts));
-                currentThread.SetApartmentState(ApartmentState.STA);
-                currentThread.IsBackground = true;
-                currentThread.Start();
+                _currentThread = new Thread(ts);
+                _currentThread.SetApartmentState(ApartmentState.STA);
+                _currentThread.IsBackground = true;
+                _currentThread.Start();
             }
             catch (ThreadAbortException) { }
             catch (Exception ex) { ExceptionActions(ex); }
@@ -214,9 +216,9 @@ namespace NXLM
         {
             try
             {
-                prBarResetCallback(true);
-                exceptionCallback(ex);
-                controlStateCallback(true);
+                _prBarResetCallback(true);
+                _exceptionCallback(ex);
+                _controlStateCallback(true);
             }
             catch (ThreadAbortException) { }
             catch (Exception)
@@ -238,12 +240,11 @@ namespace NXLM
                             var categories = new List<NXOpen.Layer.Category>();
                             group.ForEach(x =>
                             {
-                                var item = mWorkPart.LayerCategories.FindObject(x.Name);
+                                var item = _mWorkPart.LayerCategories.FindObject(x.Name);
                                 if (item != null) categories.Add(item);
                             });
                             categories.ForEach(x =>
                             {
-                                var quantity = x.GetMemberLayers().Length;
                                 var layers = new List<int>();
                                 var memberLayers = x.GetMemberLayers().ToList();
                                 memberLayers.ForEach(z =>
@@ -251,15 +252,15 @@ namespace NXLM
                                     switch (val)
                                     {
                                         case 0:
-                                            if (mWorkPart.Layers.GetAllObjectsOnLayer(z).Length != 0) layers.Add(z);
+                                            if (_mWorkPart.Layers.GetAllObjectsOnLayer(z).Length != 0) layers.Add(z);
                                             break;
                                         case 1:
-                                            if (mWorkPart.Layers.GetAllObjectsOnLayer(z).Length == 0) layers.Add(z);
+                                            if (_mWorkPart.Layers.GetAllObjectsOnLayer(z).Length == 0) layers.Add(z);
                                             break;
                                     }
                                 });
                                 x.SetMemberLayers(layers.ToArray());
-                                updateCategoriesCallback(x.Name);
+                                _updateCategoriesCallback(x.Name);
                             });
                         }
                     }
@@ -269,10 +270,10 @@ namespace NXLM
                         // ignored
                     }
                 });
-                currentThread = new Thread(ts);
-                currentThread.SetApartmentState(ApartmentState.STA);
-                currentThread.IsBackground = true;
-                currentThread.Start();
+                _currentThread = new Thread(ts);
+                _currentThread.SetApartmentState(ApartmentState.STA);
+                _currentThread.IsBackground = true;
+                _currentThread.Start();
             }
             catch (ThreadAbortException) { }
             catch (Exception)

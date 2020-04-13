@@ -3,8 +3,4 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:NXLM"
              StartupUri="MainWindow.xaml">
-    <Application.Resources>
-        <BitmapImage x:Key="cut" UriSource="Recources\cut_icon.png">
-        </BitmapImage>
-    </Application.Resources>
 </Application>
