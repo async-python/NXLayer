@@ -117,10 +117,61 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ColumnName1" xml:space="preserve">
+  <data name="ListCategoryName" xml:space="preserve">
     <value>Имя категории</value>
   </data>
-  <data name="ColumnName2" xml:space="preserve">
+  <data name="ListLayersQuantity" xml:space="preserve">
     <value>Количество слоев</value>
+  </data>
+  <data name="GenerateTemplate" xml:space="preserve">
+    <value>Генерировать категории по шаблону</value>
+  </data>
+  <data name="AddCategory" xml:space="preserve">
+    <value>Добавить категорию</value>
+  </data>
+  <data name="CategoryGroupName" xml:space="preserve">
+    <value>Имя группы категорий</value>
+  </data>
+  <data name="CategoriesQuantity" xml:space="preserve">
+    <value>Количество категорий</value>
+  </data>
+  <data name="LayersQuantityInSingleCategory" xml:space="preserve">
+    <value>Количество слоев в каждой категории</value>
+  </data>
+  <data name="AddCategoryGroup" xml:space="preserve">
+    <value>Добавить группу категорий</value>
+  </data>
+  <data name="RemoveAllCategories" xml:space="preserve">
+    <value>Удалить все категории</value>
+  </data>
+  <data name="ExitButton" xml:space="preserve">
+    <value>Выйти из приложения</value>
+  </data>
+  <data name="TextBoxInviteCategoryName" xml:space="preserve">
+    <value>Введите имя категории</value>
+  </data>
+  <data name="TextBoxInviteGroupName" xml:space="preserve">
+    <value>Введите имя группы категорий</value>
+  </data>
+  <data name="AddFreeLayers" xml:space="preserve">
+    <value>Добавить пустые слои</value>
+  </data>
+  <data name="RemoveSomeLayers" xml:space="preserve">
+    <value>Удалить слои</value>
+  </data>
+  <data name="RemoveAllLayers" xml:space="preserve">
+    <value>Удалить все слои</value>
+  </data>
+  <data name="RemoveEmptyLayers" xml:space="preserve">
+    <value>Удалить пустые слои</value>
+  </data>
+  <data name="RemoveFilledLayers" xml:space="preserve">
+    <value>Удалить слои с обьектами</value>
+  </data>
+  <data name="RemoveCategory" xml:space="preserve">
+    <value>Удалить категорию</value>
+  </data>
+  <data name="CopyName" xml:space="preserve">
+    <value>Копировать имя</value>
   </data>
 </root>

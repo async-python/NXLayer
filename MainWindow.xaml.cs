@@ -35,7 +35,7 @@ namespace NXLM
         {
             try
             {
-                Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+                //Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
                 InitializeComponent();
                 _mSession = Session.GetSession();
                 Singleton.GetInstance();
@@ -114,6 +114,7 @@ namespace NXLM
         {
             try
             {
+                //Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
                 var myForm = new MainWindow
                 {
                     WindowStartupLocation = WindowStartupLocation.CenterScreen
@@ -256,8 +257,8 @@ namespace NXLM
         {
             try
             {
-                InputCategoryName.Text = Singleton.InputTextCategory;
-                InputGroupName.Text = Singleton.InputTextGroup;
+                //InputCategoryName.Text = Singleton.InputTextCategory;
+                //InputGroupName.Text = Singleton.InputTextGroup;
                 InputCategoryName.Foreground = Brushes.LightGray;
                 InputGroupName.Foreground = Brushes.LightGray;
                 InputCategoryName.SetStringTextBoxBehavior(InputCategoryName.Text, CreateCategory);

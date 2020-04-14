@@ -61,20 +61,173 @@ namespace NXLM.Properties.Lang {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Name.
+        ///   Ищет локализованную строку, похожую на Add category.
         /// </summary>
-        public static string ColumnName1 {
+        public static string AddCategory {
             get {
-                return ResourceManager.GetString("ColumnName1", resourceCulture);
+                return ResourceManager.GetString("AddCategory", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Count.
+        ///   Ищет локализованную строку, похожую на Add category group.
         /// </summary>
-        public static string ColumnName2 {
+        public static string AddCategoryGroup {
             get {
-                return ResourceManager.GetString("ColumnName2", resourceCulture);
+                return ResourceManager.GetString("AddCategoryGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Add empty layers.
+        /// </summary>
+        public static string AddFreeLayers {
+            get {
+                return ResourceManager.GetString("AddFreeLayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Categories quantity.
+        /// </summary>
+        public static string CategoriesQuantity {
+            get {
+                return ResourceManager.GetString("CategoriesQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Category group name.
+        /// </summary>
+        public static string CategoryGroupName {
+            get {
+                return ResourceManager.GetString("CategoryGroupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Copy name.
+        /// </summary>
+        public static string CopyName {
+            get {
+                return ResourceManager.GetString("CopyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Quit.
+        /// </summary>
+        public static string ExitButton {
+            get {
+                return ResourceManager.GetString("ExitButton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Generate categories by template.
+        /// </summary>
+        public static string GenerateTemplate {
+            get {
+                return ResourceManager.GetString("GenerateTemplate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Layers quantity in each category.
+        /// </summary>
+        public static string LayersQuantityInSingleCategory {
+            get {
+                return ResourceManager.GetString("LayersQuantityInSingleCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Category Name.
+        /// </summary>
+        public static string ListCategoryName {
+            get {
+                return ResourceManager.GetString("ListCategoryName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Layers quantity.
+        /// </summary>
+        public static string ListLayersQuantity {
+            get {
+                return ResourceManager.GetString("ListLayersQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove all categories.
+        /// </summary>
+        public static string RemoveAllCategories {
+            get {
+                return ResourceManager.GetString("RemoveAllCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove all layers.
+        /// </summary>
+        public static string RemoveAllLayers {
+            get {
+                return ResourceManager.GetString("RemoveAllLayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove category.
+        /// </summary>
+        public static string RemoveCategory {
+            get {
+                return ResourceManager.GetString("RemoveCategory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove empty layers.
+        /// </summary>
+        public static string RemoveEmptyLayers {
+            get {
+                return ResourceManager.GetString("RemoveEmptyLayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove layers with objects.
+        /// </summary>
+        public static string RemoveFilledLayers {
+            get {
+                return ResourceManager.GetString("RemoveFilledLayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Remove some layers.
+        /// </summary>
+        public static string RemoveSomeLayers {
+            get {
+                return ResourceManager.GetString("RemoveSomeLayers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Enter the name of the category.
+        /// </summary>
+        public static string TextBoxInviteCategoryName {
+            get {
+                return ResourceManager.GetString("TextBoxInviteCategoryName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Enter the name of the category group.
+        /// </summary>
+        public static string TextBoxInviteGroupName {
+            get {
+                return ResourceManager.GetString("TextBoxInviteGroupName", resourceCulture);
             }
         }
     }

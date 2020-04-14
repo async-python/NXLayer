@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         xmlns:language ="clr-namespace:NXLM.Properties.Lang"
-        xmlns:nxlm="clr-namespace:NXLM"
         Title="NX Layer Manager" Height="624" Width="520" ResizeMode="NoResize" Topmost="True" Margin="2" WindowStyle="ThreeDBorderWindow" Loaded="NXLayerManager_Loaded" Icon="Resources\rad_icon.ico">
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -47,37 +46,37 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ContextMenu>
                     <ContextMenu>
-                        <MenuItem x:Name="MenuItemAdd" Header="Добавить пустые слои" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                        <MenuItem x:Name="MenuItemAdd" Header="{x:Static language:Lang.AddFreeLayers}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
                             <MenuItem.Icon>
                                 <Image Source="Resources\add_lay.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem x:Name="MenuItemDel" Header="Убрать слои">
+                        <MenuItem x:Name="MenuItemDel" Header="{x:Static language:Lang.RemoveSomeLayers}">
                             <MenuItem.Icon>
                                 <Image Source="Resources\del_remov.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem x:Name="MenuItemDelAll" Header="Убрать все слои" Click="MenuItemDelAll_Click">
+                        <MenuItem x:Name="MenuItemDelAll" Header="{x:Static language:Lang.RemoveAllLayers}" Click="MenuItemDelAll_Click">
                             <MenuItem.Icon>
                                 <Image Source="Resources\del_nobjects.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem x:Name="MenuDelEmpty" Header="Убрать пустые слои" Click="MenuDelEmpty_Click">
+                        <MenuItem x:Name="MenuDelEmpty" Header="{x:Static language:Lang.RemoveEmptyLayers}" Click="MenuDelEmpty_Click">
                             <MenuItem.Icon>
                                 <Image Source="Resources\rec_empty.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem x:Name="MenuDelFull" Header="Убрать слои с объектами" Click="MenuDelFull_Click">
+                        <MenuItem x:Name="MenuDelFull" Header="{x:Static language:Lang.RemoveFilledLayers}" Click="MenuDelFull_Click">
                             <MenuItem.Icon>
                                 <Image Source="Resources\rec_full.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Удалить категорию" Click="DeleteAllCategories">
+                        <MenuItem Header="{x:Static language:Lang.RemoveCategory}" Click="DeleteAllCategories">
                             <MenuItem.Icon>
                                 <Image Source="Resources\delete_icon.ico"></Image>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <MenuItem Header="Копировать имя" Command="ApplicationCommands.Copy">
+                        <MenuItem Header="{x:Static language:Lang.CopyName}" Command="ApplicationCommands.Copy">
                             <MenuItem.Icon>
                                 <Image Source="Resources\copy_icon.ico"></Image>
                             </MenuItem.Icon>
@@ -86,37 +85,37 @@
                 </ListView.ContextMenu>
                 <ListView.View>
                     <GridView ColumnHeaderStringFormat="">
-                        <GridViewColumn Header="{x:Static language:Lang.ColumnName1}" DisplayMemberBinding="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="125"/>
-                        <GridViewColumn Header="{x:Static language:Lang.ColumnName2}" DisplayMemberBinding="{Binding LayCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="auto"/>
+                        <GridViewColumn Header="{x:Static language:Lang.ListCategoryName}" DisplayMemberBinding="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="125"/>
+                        <GridViewColumn Header="{x:Static language:Lang.ListLayersQuantity}" DisplayMemberBinding="{Binding LayCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="auto"/>
                     </GridView>
                 </ListView.View>
             </ListView>
             <StackPanel Grid.Column="1" Margin="0,0,0,0">
 
-                <Button Content="Создать категории по умолчанию" Margin="3,3,3,0" VerticalAlignment="Top" Height="25" Click="CreateCategoriesTemplate_Click" RenderTransformOrigin="0.5,0.5"/>
+                <Button Content="{x:Static language:Lang.GenerateTemplate}" Margin="3,3,3,0" VerticalAlignment="Top" Height="25" Click="CreateCategoriesTemplate_Click" RenderTransformOrigin="0.5,0.5"/>
                 <Separator Height="25" Margin="3,0" VerticalAlignment="Top" Background="Black"/>
-                <Label Content="Имя категории" VerticalAlignment="Top" Margin="3,0" Height="25" Padding="3.7,5,3,5" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Background="{x:Null}"/>
-                <TextBox x:Name="InputCategoryName" Height="25" TextWrapping="Wrap" Text="Имя категории" VerticalAlignment="Top" VerticalContentAlignment="Center"  Margin="3,0">
+                <Label Content="{x:Static language:Lang.ListCategoryName}" VerticalAlignment="Center" Margin="3,0" Height="25" Padding="3.7,1,3,1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" Background="{x:Null}"/>
+                <TextBox x:Name="InputCategoryName" Height="25" Text="{x:Static language:Lang.TextBoxInviteCategoryName}" VerticalAlignment="Top" VerticalContentAlignment="Center"  Margin="3">
                     <TextBox.Background>
                         <ImageBrush/>
                     </TextBox.Background>
                 </TextBox>
-                <Label Content="Количество слоев в категории" Margin="3,0" VerticalAlignment="Top" RenderTransformOrigin="0.56,-2" Height="25" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"/>
+                <Label Content="{x:Static language:Lang.ListLayersQuantity}" Margin="3,0" VerticalAlignment="Top" RenderTransformOrigin="0.56,-2" Height="25" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center"/>
                 <TextBox x:Name="InputLayerCount" HorizontalAlignment="Left" Height="25" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="78" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" RenderTransformOrigin="0,8" Margin="3,0,0,0" MaxLength="3" MaxLines="1"/>
-                <Button x:Name="CreateCategory" Content="Добавить категорию" Margin="3,5,3,0" VerticalAlignment="Center" Height="25" Click="CreateSingleCategory_Click" FlowDirection="RightToLeft" Padding="1" Grid.IsSharedSizeScope="True" RenderTransformOrigin="0.603,0.306" VerticalContentAlignment="Center" IsEnabled="False"/>
+                <Button x:Name="CreateCategory" Content="{x:Static language:Lang.AddCategory}" Margin="3,5,3,0" VerticalAlignment="Center" Height="25" Click="CreateSingleCategory_Click" FlowDirection="RightToLeft" Padding="1" Grid.IsSharedSizeScope="True" RenderTransformOrigin="0.603,0.306" VerticalContentAlignment="Center" IsEnabled="False"/>
                 <Separator Height="25" Margin="3,0" Background="Black" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
-                <Label Content="Имя группы категорий" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.038" Width="137" Height="25" Margin="3,0,0,0" Padding="1"/>
-                <TextBox x:Name="InputGroupName" Height="25" TextWrapping="Wrap" Text="Имя группы" VerticalAlignment="Center" RenderTransformOrigin="0.538,-3.043" VerticalContentAlignment="Center" Margin="3,0"/>
-                <Label Content="Количество категорий в группе" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.842,0.308" Margin="3,0,0,0" Height="25" Padding="1" VerticalContentAlignment="Center"/>
+                <Label Content="{x:Static language:Lang.CategoryGroupName}" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="-0.132,0.038" Width="137" Height="25" Margin="3,0,0,0" Padding="1"/>
+                <TextBox x:Name="InputGroupName" Height="25" TextWrapping="Wrap" Text="{x:Static language:Lang.TextBoxInviteGroupName}" VerticalAlignment="Center" RenderTransformOrigin="0.538,-3.043" VerticalContentAlignment="Center" Margin="3,0"/>
+                <Label Content="{x:Static language:Lang.CategoriesQuantity}" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="0.842,0.308" Margin="3,0,0,0" Height="25" Padding="1" VerticalContentAlignment="Center"/>
                 <TextBox x:Name="InputGroupCount" Height="25" TextWrapping="Wrap" Text="1" VerticalAlignment="Center" RenderTransformOrigin="0.372,0.478" TextAlignment="Center" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="78" HorizontalContentAlignment="Center" Margin="3,0,0,0" MaxLength="3" MaxLines="1"/>
-                <Label Content="Количество слоев в категории" VerticalAlignment="Center" RenderTransformOrigin="0.842,0.308" Margin="3,0,0,0" Height="25" Padding="1" TextOptions.TextFormattingMode="Display" VerticalContentAlignment="Center"/>
+                <Label Content="{x:Static language:Lang.LayersQuantityInSingleCategory}" VerticalAlignment="Center" RenderTransformOrigin="0.842,0.308" Margin="3,0,0,0" Height="25" Padding="1" VerticalContentAlignment="Center"/>
                 <TextBox x:Name="InputGroupLayersCount" HorizontalAlignment="Left" Height="25" TextWrapping="Wrap" Text="1" VerticalAlignment="Top" Width="78" TextAlignment="Center" Padding="1" Margin="3,0,0,0" VerticalContentAlignment="Center" MaxLength="3" MaxLines="1"/>
-                <Button x:Name="CreateGroupCategories" Content="Создать группу категорий" Margin="3,5,3,0" VerticalAlignment="Top" Width="auto" Height="23" Padding="1" HorizontalContentAlignment="Center" IsEnabled="False" Click="CreateGroupCategories_Click"/>
+                <Button x:Name="CreateGroupCategories" Content="{x:Static language:Lang.AddCategoryGroup}" Margin="3,5,3,0" VerticalAlignment="Top" Width="auto" Height="23" Padding="1" HorizontalContentAlignment="Center" IsEnabled="False" Click="CreateGroupCategories_Click"/>
                 <Separator Height="25" Margin="3,0" VerticalAlignment="Top" Background="Black"/>
-                <Button Content="Удалить все категории" Margin="3,0" VerticalAlignment="Top" Height="25" Click="DeleteButton_CLick"/>
+                <Button Content="{x:Static language:Lang.RemoveAllCategories}" Margin="3,0" VerticalAlignment="Top" Height="25" Click="DeleteButton_CLick"/>
                 <Separator Height="25" Margin="3,0" VerticalAlignment="Top" Background="Black"/>
             </StackPanel>
-            <Button Content="EXIT" Margin="3,0,3,3" Click="Button_Click" VerticalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Grid.Column="1"/>
+            <Button Content="{x:Static language:Lang.ExitButton}" Margin="3,0,3,3" Click="Button_Click" VerticalContentAlignment="Center" VerticalAlignment="Bottom" Height="25" Grid.Column="1"/>
         </Grid>
 
     </Grid>

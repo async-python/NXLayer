@@ -1,4 +1,6 @@
-﻿namespace NXLM
+﻿using System.Windows;
+
+namespace NXLM
 {
     public class Singleton
     {
@@ -13,6 +15,7 @@
 
         public static Singleton GetInstance()
         {
+            
             return Instance;
         }
     }
